@@ -1,7 +1,10 @@
+#ifndef API_H
+#define API_H
 
 
+typedef EstadoNetworkSt *EstadoNetwork;
 
-typedef EstadoNetwork * EstadoNetworkSt;
+typedef unsigned int u32;
 
 
 /*
@@ -22,7 +25,7 @@ int chauNetwork(EstadoNetwork N);
 
 
 /*
-	*lee de un imput un lado y lo agrega a EstadoNetwork con un flujo 0.
+	*lee de un input un lado y lo agrega a EstadoNetwork con un flujo 0.
 	*input: "x y c" (sin las comillas) donde el lado es xy y c es su capacidad.
 	*	los valores seran u32. Si existe xy entonces no formara parte de  la 
 	*	entrada el lado yx, no habra lados repetidos ni loops.
@@ -58,8 +61,10 @@ int aumentarFlujo(EstadoNetwork N);
 
 
 /*
-	*
+	*imprime el flujo maximal
+	*input: network
+	*output:depende verbosidad
 */
-
 void imprimirFlujoMaximal(EstadoNetwork N);
 
+#endif
