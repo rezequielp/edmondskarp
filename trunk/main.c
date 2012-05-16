@@ -1,8 +1,7 @@
 #include "API.h"
 #include <stdio.h>
 #include <stdlib.h>
-
-#define EOF '\0'
+#include <stdbool.h>
 
 
 static void file_to_stdin(FILE path);
@@ -11,40 +10,60 @@ static bool controlar_parametros(int argc, char * argv[]);
 
 
 void main(int argc, char * argv[]){
-        int i,aux, is_eof;      /*indice*/
-        EstadoNetwork network;  /*network principal*/
-        char terminador;
-        FILE archivo;
-        aux = 1;
-        if (controlar_parametros(int argc, char * argv[])){
-                printf("Error al ingresar datos\n");
-                exit(EXIT_FAILURE);
-        }
-	net = networkNuevo(argv[2]);
-        fflush(stdin);/*limpio el input antes de usarlo*/
-        if(argc==3)
-                archivo = fopen(archivo)
-        do{
-                if(argc==3)
-                        is_eof = file_to_stdin(path);
-                leerUnLado(network);
-                fflush(STDIN);
-        }while(is_eof != -1 && terminador == C);
-        /*que el flujo no se pueda aumentar no es un error. 
-         *poner otro nombre a la variable, que sea mas representativo.
-        */
-        while(aux == 1){
-                aux = aumentarFlujo(network);
+	int up_flow, readed_side;      /*indice*/
+	EstadoNetwork network;  /*network principal*/
+	Lexer * input = NULL;
+	FILE fd;
+	
+	up_flow = 1;
+	readed_side = 1;
+	/*Se controlan los parametros de ingreso*/
+	if (ctrl_parameters(int argc, char * argv[])){
+		printf("Error al ingresar datos\n");
+		exit(EXIT_FAILURE);
 	}
-        if (aux == -1)){
-                printf("error del aumentarFlujo\n");
-                if(chauNetwork(network) == 0)
-                        printf("error a liberar el network");
-                exit(EXIT_FAILURE);
-        }
-	imprimirFlujoMaximal(network);
-        if(chauNetwork(network) == 0)
-                printf("error a liberar el network");
+	/* Si el network se carga de un archivo, se intenta abrirlo (read only)*/
+	if(argc==4){
+		fd = fopen(argv[3], "r");
+		if (!fd){
+			printf("Error al intentar abrir el archivo");
+			exit(EXIT_FAILURE);
+		}
+	}
+	/* Se crea un nuevo network con la verbosidad ingresada*/
+	network = networkNuevo(argv[2]);
+	/*limpio el input antes de usarlo (no se si haria falta)*/
+	fflush(stdin);
+	/* Se crea el lexer sobre stdin*/
+	input = lexer_new (stdin);
+	/* Se lee hasta que sea EOF y no haya quedado nada por leer*/
+	while(!lexer_is_off(input) && readed_side){
+		if(argc==4)
+			file_to_stdin(fd);
+		readed_side = leerUnLado(network);
+		/* no hace falta limpiar el input porq lexer se come todo lo leido
+		 * no hace falta saber el retorno de file_to_stdin porque si en stdin
+		 * no se ingresa nada, entonces leerUnLado retorna 0*/
+	}
+	lexer_destroy(input);
+
+	/* HASTA ACA LLEGUE*/
+	
+	/*que el flujo no se pueda aumentar no es un error.
+		*poner otro nombre a la variable, que sea mas representativo.
+	*/
+	while(up_flow){
+			up_flow = aumentarFlujo(network);
+}
+	if (aux == -1)){
+			printf("error del aumentarFlujo\n");
+			if(chauNetwork(network) == 0)
+					printf("error a liberar el network");
+			exit(EXIT_FAILURE);
+	}
+imprimirFlujoMaximal(network);
+	if(chauNetwork(network) == 0)
+			printf("error a liberar el network");
 }
 
 
