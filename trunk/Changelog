@@ -1,0 +1,25 @@
+USEN ESTE ARCHIVO PARA COMUNICAR LO QUE HICIERON, PREGUNTAS, ETC
+ES PARA SEGUIMIENTO DEL PROYECTO (para no leer los log del svn)
+
+
+eze:
+* Main:
+ - terminado (mas adelante se vera de modificarlo)
+ - programacion defensiva bastante lograda, faltaria usar errno
+ - modifique algunas cosas en API.h y API.c para poder complicarlo
+fijarse que tuve q tocar las estructuras, porque sino me hacia bardo.
+Ya tenemos el makefile, le tuve que quitar -Werror porq para las flags
+que tiene, getline() no pertenece a GNU lib C sino a C++, habra que preguntar
+si esa funcion se permite, sino hay q encontrar otra solucion mas fea con fget() o algo asi
+
+* Prueben mas casos, no hice tiempo de debugar todas las formas
+
+ERROR IMPORTANTE:
+la forma en la que se redirecciona el stdin es por redireccion desde el shell.
+O sea que tooodo lo que esta echo, no es necesario y estaria mal.
+Cuando se ingresa algo como:
+EK -v 112 < Nombre_de_un_archivo_donde_tenemos_un_network
+El pico de pato ya se toma como redireccionamento de input.
+Ademas, asi como esta hecho, el getline() lee bien los datos, pero el fwrite() no puede
+escribir sobre stdin porque es de solo lectura!!!
+
