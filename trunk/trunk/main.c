@@ -20,10 +20,7 @@ int main(int argc, char * argv[]){
 	/*Se controlan los parametros de ingreso*/
 	if (ctrl_parameters(argc, argv)){
 		/* Se crea un nuevo network con la verbosidad*/
-		/*ver q onda con la verbosidad (es char* y debe ser int)
-		 * se lo quite para debuggin
-		 */
-		network = networkNuevo(1);
+		network = networkNuevo(atoi(argv[2]));
 	}
 
 	if (network != NULL){
