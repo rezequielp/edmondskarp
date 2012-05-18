@@ -1,6 +1,24 @@
 USEN ESTE ARCHIVO PARA COMUNICAR LO QUE HICIERON, PREGUNTAS, ETC
 ES PARA SEGUIMIENTO DEL PROYECTO (para no leer los log del svn)
 
+eze:
+* Api.c:
+  - hechas las funciones de nuevo y chau network
+  - chaunetwork nunca va a devolver 0, porque no hay error que suceda ya que
+free no retorna valores y otra cosa no se hace. 
+  - en nuevonetwork hice una funcion add_verbose, que chequea y agrega el verbose.
+Lo hago desp de crear el net porque asi todo lo referido a verbose se hace en la otra 
+funcion; sino hay que hacer un check_verbose y luego hacer las mismas operaciones en
+nuevonetwork para agregarlas a las estructura.
+
+* Main:
+  - agregado el conversor de verbose (string a int)
+  - Estuve investigando por el tema de redireccionamiento, pero todavia no llegue a 
+nada concluso. Mi idea es programar todo para que funcione con stdin, y dejar eso 
+para el final, ya que no es necesario por el momento.
+
+------------------------------
+
 
 eze:
 * Main:
