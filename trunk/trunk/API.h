@@ -1,7 +1,7 @@
 #ifndef API_H
 #define API_H
 
-
+typedef struct ENetwork EstadoNetworkSt;
 typedef EstadoNetworkSt *EstadoNetwork;
 
 typedef unsigned int u32;
@@ -19,7 +19,7 @@ EstadoNetwork networkNuevo(int Verbosidad);
 /*
 	*Destruye y libera un EstadoNetwork.
 	*input: EstadoNetwork a liberar
-	*output: ok=>1 | error=>0
+	*output: ok=>!Null | error=>Null
 */
 int chauNetwork(EstadoNetwork N);
 
@@ -31,7 +31,7 @@ int chauNetwork(EstadoNetwork N);
 	*	entrada el lado yx, no habra lados repetidos ni loops.
 	*output: ok=>1 | error=>0
 */
-int leerUnLado(EstadoNetwork N);
+int LeerUnLado(EstadoNetwork N);
 
 
 
@@ -55,16 +55,16 @@ int leerUnLado(EstadoNetwork N);
 	*		printf("Corte Minimal: S = {s,x_1,...}\n")
 	*		printf("Capacidad: <cantDelIncremento>")
 	*input:  EstadoNetwork
-	*output: ok=>1 | error=>0
+	*output: aumento=>1 | no aumento=>0 | error=>-1
 */
-int aumentarFlujo(EstadoNetwork N);
+int AumentarFlujo(EstadoNetwork N);
 
 
 /*
 	*imprime el flujo maximal
 	*input: network
-	*output:depende verbosidad
+	*output: por standar output y depende de verbosidad
 */
-void imprimirFlujoMaximal(EstadoNetwork N);
+void ImprimirFlujoMaximal(EstadoNetwork N);
 
 #endif

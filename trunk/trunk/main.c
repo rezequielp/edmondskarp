@@ -1,92 +1,188 @@
 #include "API.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdbool.h>
+#include <assert.h>
 
 
-static void file_to_stdin(FILE path);
-static bool controlar_parametros(int argc, char * argv[]);
+static bool file_to_stdin(FILE *fd);
+static bool ctrl_parameters(int argc, char * argv[]);
+static bool load_from_file(EstadoNetwork network, char * path);
+static bool load_from_stdin(EstadoNetwork network);
+static bool calculate_max_flow(EstadoNetwork network);
 
 
-
-void main(int argc, char * argv[]){
-	int up_flow, readed_side;      /*indice*/
-	EstadoNetwork network;  /*network principal*/
-	Lexer * input = NULL;
-	FILE fd;
+int main(int argc, char * argv[]){
+	bool its_ok = false;      /*indicador de operaciones exitosas*/
+	EstadoNetwork network = NULL;  /*network principal*/
 	
-	up_flow = 1;
-	readed_side = 1;
 	/*Se controlan los parametros de ingreso*/
-	if (ctrl_parameters(int argc, char * argv[])){
-		printf("Error al ingresar datos\n");
-		exit(EXIT_FAILURE);
+	if (ctrl_parameters(argc, argv)){
+		/* Se crea un nuevo network con la verbosidad*/
+		/*ver q onda con la verbosidad (es char* y debe ser int)
+		 * se lo quite para debuggin
+		 */
+		network = networkNuevo(1);
 	}
-	/* Si el network se carga de un archivo, se intenta abrirlo (read only)*/
-	if(argc==4){
-		fd = fopen(argv[3], "r");
-		if (!fd){
-			printf("Error al intentar abrir el archivo");
-			exit(EXIT_FAILURE);
+
+	if (network != NULL){
+		/* Si el network se carga de un archivo o de estandar input*/
+		if(argc == 4){
+			its_ok = load_from_file(network, argv[3]);
+		}else{
+			its_ok = load_from_stdin(network);
+		}
+		/*se calcula e imprime el flujo maximal*/
+		if (its_ok){
+			its_ok = calculate_max_flow(network);
+		}
+		/* destruyo el network*/
+		if(chauNetwork(network) == 1){
+			printf("Error al intentar liberar el network\n");
+			its_ok = false;
 		}
 	}
-	/* Se crea un nuevo network con la verbosidad ingresada*/
-	network = networkNuevo(argv[2]);
-	/*limpio el input antes de usarlo (no se si haria falta)*/
-	fflush(stdin);
-	/* Se crea el lexer sobre stdin*/
-	input = lexer_new (stdin);
-	/* Se lee hasta que sea EOF y no haya quedado nada por leer*/
-	while(!lexer_is_off(input) && readed_side){
-		if(argc==4)
-			file_to_stdin(fd);
-		readed_side = leerUnLado(network);
-		/* no hace falta limpiar el input porq lexer se come todo lo leido
-		 * no hace falta saber el retorno de file_to_stdin porque si en stdin
-		 * no se ingresa nada, entonces leerUnLado retorna 0*/
-	}
-	lexer_destroy(input);
 
-	/* HASTA ACA LLEGUE*/
+	/*exit satisfactorio, o no*/
+	if (!its_ok){
+		exit(EXIT_FAILURE);
+	}
+	return 0;
+}
+
+/* Se controlan los parametros claves
+ * Ret: true si no hubo error
+ */
+bool ctrl_parameters (int argc, char * argv[]){
+	bool result = false;
 	
-	/*que el flujo no se pueda aumentar no es un error.
-		*poner otro nombre a la variable, que sea mas representativo.
-	*/
-	while(up_flow){
-			up_flow = aumentarFlujo(network);
-}
-	if (aux == -1)){
-			printf("error del aumentarFlujo\n");
-			if(chauNetwork(network) == 0)
-					printf("error a liberar el network");
-			exit(EXIT_FAILURE);
+	if (argc == 3 || argc == 4){
+		if (strcmp(argv[1], "-v") == 0){
+			result = true;
+		}
 	}
-imprimirFlujoMaximal(network);
-	if(chauNetwork(network) == 0)
-			printf("error a liberar el network");
+	if (!result){
+		printf("Error al ingresar parametros\n");
+		/*Aca tambien se puede imprir la ayuda sintactica*/
+	}
+	return result;
+}
+
+/*Carga los lados del network desde un archivo.
+* Pre: network != NULL
+* Ret: true, si no hubo error
+*/
+bool load_from_file(EstadoNetwork network, char * path){
+	FILE *fd;
+	bool result = true;
+	int readed_side;
+	
+	assert(network != NULL);
+	/* Se abre el archivo con permiso de solo lectura*/
+	fd = fopen(path, "r");
+	if (fd == NULL){
+		printf("Error al intentar abrir el archivo\n");
+		result = false;
+	}else{
+		do{
+			/* se intenta escribir una linea datos del archivo en stdinput*/
+			if (!file_to_stdin(fd)){
+				result = false;
+				break;
+			}
+			readed_side = LeerUnLado(network);
+			/* no hace falta limpiar el input porq lexer se come todo lo leido
+			* caso vacio -> leerUnLado retorna 0*/
+		}while (readed_side);
+	}
+	/*se cierra el archivo*/
+	if (fd != NULL && fclose(fd) != 0){
+		printf("Error al intentar cerrar el archivo\n");
+		result = false;
+	}
+	return result;
 }
 
 
+/*Carga los lados del network desde el stdin. Ingreso manual por consola
+ * Pre: network != NULL
+ * Ret: true si no hubo error (en realidad siempre sera true)
+ */
+bool load_from_stdin(EstadoNetwork network){
+	int readed_side; /*captura el resultado de leerUnLado*/
+	bool result = true; /*resultado de la funcion*/
+	
+	assert(network != NULL);
+	do{
+		readed_side = LeerUnLado(network);
+		/* no hace falta limpiar el input porq lexer se come todo lo leido
+		* caso vacio -> leerUnLado retorna 0*/
+	}while (readed_side);
+	
+	return result;
+}
 
-/*copia hasta encontrar un '\n' desde el archivo path al STDIN.
- *Devuelve -1 en caso de error o EOF.
- *Tiene como precondicion que el path es un archivo con 3 int separados por 1 
+
+/*Calcula e imprime flujo maximal.
+ * Pre: network != NULL
+ * Ret: true si no hubo error
+ */
+bool calculate_max_flow(EstadoNetwork network){
+	int up_flow;	/*captura el resultado de aumentarflujo*/
+	bool result = true; /*resultado de la funcion*/
+
+	assert(network != NULL);
+	/*que el flujo no se pueda aumentar no es un error.*/
+	do{
+		up_flow = AumentarFlujo(network);
+	}while(up_flow);
+	
+	/*imprimo el resultado del calculo*/
+	if (up_flow == 0){
+		ImprimirFlujoMaximal(network);
+	}else{
+		printf("Error al intentar aumentar el flujo\n");
+		result = false;
+	}
+	
+	return result;
+}
+
+
+/*copia hasta encontrar un '\n' (o EOF) desde el archivo path al stdin.
+ * Pre: fd != NULL
+ * Ret: true si no hubo error.
+ */
+/*ESTO NO SE REVISA ACA, ES EN EL PARSER DE LEERUNLADO()
+ *Pre: el path es un archivo con 3 int separados por 1
  *espacio entre ellos y luego un '\n', esta estructura puede estar repetida 
  *varias veces. al final hay un EOF.
- *s::= +{int+' '+int+' '+int+'\n'}+EOF 
- *Ej: 2 4 6\n2 4 5 54\n321321 321321 4888\nEOF
+ *s::= {'+int+' '+int+' '+int+'\n'}+EOF
+ *Ej: 2 4 6\n2 4 54\n321321 321321 4888\nEOF
 */
-int file_to_stdin(FILE archivo){
-        char * line;/*buffer para almacenar las lineas leidas*/
+bool file_to_stdin(FILE *fd){
+        char * line = NULL; /*buffer para almacenar las lineas leidas*/
+        size_t len;  /*tamaño del buffer*/
         int large; /*cantidad de elementos leidos por getline*/
-        
-        fflush(stdin);/*limpio el input antes de usarlo*/ 
-        line = (char) malloc (sizeof(struct char));
-        
+        int count; /*cantidad de datos escritos por fwrite*/
+        bool result = true;
+
+		assert(fd != NULL);
+		len = sizeof(char);
+        line = (char*) malloc(len);
         /*getline hace un realloc si el buffer es chico ;)
          *esto realentiza el cargado pero facilita el uso de buffers dinamicos ;)
          */
-        large = getline(line, archivo, )
-        write(line, sizeof(struct char), large, STDIN);
-        return large;
+        large = getline(&line, &len, fd);
+		if (large != EOF){
+			count = fwrite(line, sizeof(char), large, stdin);
+			printf("count %i = %i large ? \n", count, large);
+			if (count != large){
+				printf("Error al intentar escribir en estandar input\n");
+				result = false;
+			}
+		}
+		free(line);
+        return result;
 }
