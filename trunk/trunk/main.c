@@ -73,7 +73,7 @@ bool ctrl_parameters (int argc, char * argv[]){
 bool load_from_file(EstadoNetwork network, char * path){
 	FILE *fd;
 	bool result = true;
-	int readed_side;
+	int readed_edge;
 	
 	assert(network != NULL);
 	/* Se abre el archivo con permiso de solo lectura*/
@@ -88,10 +88,10 @@ bool load_from_file(EstadoNetwork network, char * path){
 				result = false;
 				break;
 			}
-			readed_side = LeerUnLado(network);
+			readed_edge = LeerUnLado(network);
 			/* no hace falta limpiar el input porq lexer se come todo lo leido
 			* caso vacio -> leerUnLado retorna 0*/
-		}while (readed_side);
+		}while (readed_edge);
 	}
 	/*se cierra el archivo*/
 	if (fd != NULL && fclose(fd) != 0){
@@ -126,19 +126,19 @@ bool load_from_stdin(EstadoNetwork network){
  * Ret: true si no hubo error
  */
 bool calculate_max_flow(EstadoNetwork network){
-	int up_flow;	/*captura el resultado de aumentarflujo*/
+	int flow_increased;	/*captura el resultado de aumentarflujo*/
 	bool result = true; /*resultado de la funcion*/
 
 	assert(network != NULL);
 	/*que el flujo no se pueda aumentar no es un error.*/
 	do{
-		up_flow = AumentarFlujo(network);
-	}while(up_flow);
+		flow_increased = AumentarFlujo(network);
+	}while(flow_increased);
 	
 	/*imprimo el resultado del calculo*/
-	if (up_flow == 0){
+	if (!flow_increased){
 		ImprimirFlujoMaximal(network);
-	}else{
+	}else if (flow_increased == ERR_FLOW){
 		printf("Error al intentar aumentar el flujo\n");
 		result = false;
 	}
@@ -169,7 +169,8 @@ bool file_to_stdin(FILE *fd){
 		len = sizeof(char);
         line = (char*) malloc(len);
         /*getline hace un realloc si el buffer es chico ;)
-         *esto realentiza el cargado pero facilita el uso de buffers dinamicos ;)
+         *esto realentiza el cargado pero facilita el uso de buffers
+         * dinamicos ;)
          */
         large = getline(&line, &len, fd);
 		if (large != EOF){
