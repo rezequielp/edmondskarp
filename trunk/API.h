@@ -5,7 +5,7 @@ typedef struct ENetwork EstadoNetworkSt;
 typedef EstadoNetworkSt *EstadoNetwork;
 
 typedef unsigned int u32;
-
+#define ERR_FLOW -1;
 
 /*
 	*Aloca memoria e inicializa la estructura de datos.
@@ -41,16 +41,16 @@ int LeerUnLado(EstadoNetwork N);
 	*Hace dos cosas distintas si existe camino aumentante.
 	*Esta funcion imprime en standar output segun la vervosidad:
 	*Si el flujo se puede aumentar
-	*	if(vervosidad mod 10 = 0) then no se imprime nada
-	*	if(vervosidad mod 10 = 1) then se imprime el valor del incremento
+	*	if(verbosidad mod 10 = 0) then no se imprime nada
+	*	if(verbosidad mod 10 = 1) then se imprime el valor del incremento
 	*		printf("Incremento del camino aumentante #: <cantDelIncremento>")
 	*		donde # es el numero del camino aumentante
-	*	if(vervosidad mod 10 = 2) then se imprime el camino y su incremento
+	*	if(verbosidad mod 10 = 2) then se imprime el camino y su incremento
 	*		printf("s,x_1,...,x_r,t: <cantDelIncremento>")
 	*Si el flujo no se puede aumentar
-	*	if(vervosidad=0,1,2,10,11,12) then 
+	*	if(verbosidad=0,1,2,10,11,12) then 
 	*		print("No hay mas caminos aumentantes")
-	*	if(vervosidad = 100,101,102,110,111,112)then se imprime lo mismo que en 
+	*	if(verbosidad = 100,101,102,110,111,112)then se imprime lo mismo que en 
 	*		el caso anterior y tambien:
 	*		printf("Corte Minimal: S = {s,x_1,...}\n")
 	*		printf("Capacidad: <cantDelIncremento>")
