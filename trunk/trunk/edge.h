@@ -23,39 +23,47 @@ typedef struct bool flagSt;
  *de aristas se defasan los indices que le siguen y no anda nada
  */
 typedef struct edArraySt edArray;
-typedef struct edgeSt * edge;
+typedef struct edgeSt edge;
 
 /*********************funciones sobre edArray***************************/
 /*crea el edArray, devuelve un puntero a la estructura y NULL si falla*/
-edge edArray_new();
+edArray *edArray_new();
+
 /*destruye el edArray y las estructura que contiene*/
-void edArray_destroy (edge xy);
+void edArray_destroy (edge *xy);
 
 /**********************consulta edArray*****************************/
 /*devuelve edarr->counter*/
-u32 edArray_size(edArray edarr);
+u32 edArray_size(edArray *edarr);
 
 
 /*devuelve el puntero al elemento i-esimo o NULL si falla*/
-edge edArray_item(edArray edarr, u32 i);
+edge *edArray_item(edArray *edarr, u32 i);
 
 
 /*devuelve true si esta vacio o false sino*/
-bool edArray_is_empty(edArray edarr);
+bool edArray_is_empty(edArray *edarr);
+
+
+
+
 
 /**********************funciones sobre edge***************************/
 /*crea un edge. devuelve el puntero y un NULL si falla*/
-edge edge_new (u32 x, u32 y, u32 cap, u32 flow);
+/*esto es de la structura, no hay q pasarlo como parametro
+ * en new solo se le da memoria y se inicializa en 0
+ * (u32 x, u32 y, u32 cap, u32 flow)*/
+edge *edge_new ();
 
 
 /*destruye el edge*/
-void edge_destroy(edge xy);
+void edge_destroy(edge *xy);
 
 
 /*añade un edge al final del arreglo, realloquea la memoria
  * y hace edarr->counter++.
 */
-void edge_add(EstadoNetwork net, edge xy)
+void *edge_add(EstadoNetwork net, edge *xy)
 
 
 /*No se eligio retorno. capaz lo mejor sea un void.
@@ -63,7 +71,7 @@ void edge_add(EstadoNetwork net, edge xy)
  *Aumenta el flujo del edge formado por los vertices "x" e "y"
  *NO HACER TODAVIA.FALTA DEFINIRLA.
 */
- edge_increase_flow (edge xy, u32 flow);
+ edge_increase_flow (edge *xy, u32 flow);
  
 /**********************consultas sobre edge***********************************/
 /*toma como bool una contante de las siguientes que representa como se manda 
@@ -72,7 +80,7 @@ void edge_add(EstadoNetwork net, edge xy)
  *BACKWARD constante que representa que el flujo se manda como backward.
  *devuelve true si el edge xy esta saturado en sentido FLAG. false sino lo esta.
 */
-bool edge_saturated (edge xy, flagSt FLAG );
+bool edge_saturated (edge *xy, flagSt FLAG );
 
 #endif
 
