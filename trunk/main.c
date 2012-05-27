@@ -151,13 +151,6 @@ bool calculate_max_flow(EstadoNetwork network){
  * Pre: fd != NULL
  * Ret: true si no hubo error.
  */
-/*ESTO NO SE REVISA ACA, ES EN EL PARSER DE LEERUNLADO()
- *Pre: el path es un archivo con 3 int separados por 1
- *espacio entre ellos y luego un '\n', esta estructura puede estar repetida 
- *varias veces. al final hay un EOF.
- *s::= {'+int+' '+int+' '+int+'\n'}+EOF
- *Ej: 2 4 6\n2 4 54\n321321 321321 4888\nEOF
-*/
 bool file_to_stdin(FILE *fd){
         char * line = NULL; /*buffer para almacenar las lineas leidas*/
         size_t len;  /*tamaño del buffer*/

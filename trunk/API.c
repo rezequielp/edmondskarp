@@ -48,7 +48,7 @@ EstadoNetwork networkNuevo(int Verbosidad){
 	EstadoNetwork net = NULL;
 	net = (EstadoNetwork) malloc(sizeof(EstadoNetworkSt));
 	if (net != NULL)){
-			net->edarr= eddArray_new();
+			net->edarr= edArray_new();
 			net->cut = new_queue();/*ver si se llama asi la funcion*/
 			net->vflujo = 0;
 			if (net->edarr == NULL  || !add_verbose(net, Verbosidad){
@@ -73,24 +73,32 @@ int chauNetwork(EstadoNetwork net){
 return result;
 }
 
+
+
 int LeerUnLado(EstadoNetwork net){
-	int result;
-	lexer * input;
-	edge xy;
+	lexer *input;
+	edge *xy;
+	int clean = 0;
+	
 	input = lexer_new(stdin);
-	xy = (edge) malloc (sizeof(struct edgeSt));
-	lexer_next_to(input, "\n");
-	parser_status = parser_input(lexer_item(input), xy);
-	lexer_destroy(input);
-	/*PARSER_ERR es 0*/
-	if (parser_status != PARSER_ERR){
-		edArray_add(net->edarr, xy);
-		/*agregar al array de busqueda*/
-	}else{
-		edge_destroy(xy);
+	if (input! = NULL){
+		/*se parsea un lado*/
+		xy = parse_edge(input);
+		/*se corre el parseo hasta la siguiente linea (o fin de archivo)*/
+		clean = parse_next_line (input);
+		/*si los parseos salieron bien y no se encontro basura, se agrega el lado*/
+		if (xy != NULL && clean){
+			edArray_add(net->edarr, xy);
+			/*agregar tmb al array de busqueda*/
+		/*se encontro basura, se destruye el lado*/
+		}else if (!clean){
+			edge_destroy(xy);
+		}
+			
+		lexer_destroy(input);
 	}
 	
-return parser_status;
+return clean;
 }
 
 int AumentarFlujo(EstadoNetwork net){
