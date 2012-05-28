@@ -5,7 +5,7 @@ typedef struct ENetwork EstadoNetworkSt;
 typedef EstadoNetworkSt *EstadoNetwork;
 
 typedef unsigned int u32;
-#define ERR_FLOW -1;
+#define FLOW_ERR -1;
 
 /*
 	*Aloca memoria e inicializa la estructura de datos.
