@@ -18,7 +18,7 @@ stack pop(stack p);
 bool is_empty(stack p);
 
 /*Devuelve el ultimo hijo agregado*/
-unsigned int ultimate_push_fst(stack p);
+unsigned int ultimate_push_son(stack p);
 
 /*Devuelve el ultimo padre agregado*/
-unsigned int ultimate_push_snd(stack p);
+unsigned int ultimate_push_father(stack p);

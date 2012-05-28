@@ -96,4 +96,3 @@ edge *edArray_item(edArray *edarr, u32 i);
 bool edArray_is_empty(edArray *edarr);
 
 #endif
-
