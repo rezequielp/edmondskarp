@@ -76,9 +76,10 @@ return result;
 
 
 int LeerUnLado(EstadoNetwork net){
+	int result = 0;
 	lexer *input;
 	edge *xy;
-	int clean = 0;
+	int clean; /*indica si no se encontro basura al parsear*/
 	
 	input = lexer_new(stdin);
 	if (input! = NULL){
@@ -86,19 +87,20 @@ int LeerUnLado(EstadoNetwork net){
 		xy = parse_edge(input);
 		/*se corre el parseo hasta la siguiente linea (o fin de archivo)*/
 		clean = parse_next_line (input);
-		/*si los parseos salieron bien y no se encontro basura, se agrega el lado*/
+		/*si parseo bien el lado y no se encontro basura, se agrega al Network*/
 		if (xy != NULL && clean){
+			/*aca tmb falta chequear q no haya ocurrido error al agregarlo*/
 			edArray_add(net->edarr, xy);
 			/*agregar tmb al array de busqueda*/
-		/*se encontro basura, se destruye el lado*/
-		}else if (!clean){
+			result = clean;
+		/*si se encontro basura, se destruye el lado*/
+		}else if (xy != NULL){
 			edge_destroy(xy);
 		}
-			
 		lexer_destroy(input);
 	}
 	
-return clean;
+return result;
 }
 
 int AumentarFlujo(EstadoNetwork net){

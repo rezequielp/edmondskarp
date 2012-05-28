@@ -138,7 +138,7 @@ bool calculate_max_flow(EstadoNetwork network){
 	/*imprimo el resultado del calculo*/
 	if (!flow_increased){
 		ImprimirFlujoMaximal(network);
-	}else if (flow_increased == ERR_FLOW){
+	}else if (flow_increased == FLOW_ERR){
 		printf("Error al intentar aumentar el flujo\n");
 		result = false;
 	}
