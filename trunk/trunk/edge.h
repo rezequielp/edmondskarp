@@ -55,6 +55,12 @@ void edge_set_sense (edge *xy, flag_s FLAG)
 /* Devuelve el sentido del edge en el que se va a correr flujo*/
 flag_s edge_get_sense (edge *xy);
 
+/* Devuelve el nombre del nodo 'x' del edge*/
+u32 edge_get_x (edge *xy);
+
+/* Devuelve el nombre del nodo 'y' del edge*/
+u32 edge_get_y (edge *xy);
+
 /* Decide si el lado se encuentra saturado en el sentido consultado
  * Pre: edge != NULL y cap >= flow
  * Ret: true si el edge xy esta saturado en sentido FLAG. false sino lo esta.

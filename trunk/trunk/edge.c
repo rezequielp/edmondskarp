@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <assert.h>
 #include "edge.h"
 
@@ -68,6 +69,16 @@ flag_s edge_get_sense (edge *xy){
 	return xy->sense;
 }
 
+/* Devuelve el nombre del nodo 'x' del edge*/
+u32 edge_get_x (edge *xy){
+	return xy->x;
+}
+
+/* Devuelve el nombre del nodo 'y' del edge*/
+u32 edge_get_y (edge *xy){
+	return xy->y;
+}
+
 /* Decide si el lado se encuentra saturado en el sentido consultado
  * Pre: edge != NULL y cap >= flow
  * Ret: true si el edge xy esta saturado en sentido FLAG. false sino lo esta.
@@ -129,14 +140,16 @@ void edArray_destroy (edArray *edarr){
 /* Añade un edge al final del arreglo*/
 void *edArray_add_edge (edArray *edarr, edge *xy){
 	size_t new_size;
+	u32 * aux_ptr;
 	
 	assert(edarr != NULL);
 	assert(xy != NULL);
 	/* Se (re)alloquea el arreglo (adiciona memoria)*/
 	new_size = (edarr->counter + 1) * sizeof(struct edgeSt);
-	edarr->edges = (u32 *) realloc(edarr->edges, new_size);
+	aux_ptr = (u32 *) realloc(edarr->edges, new_size);
 	/* Si se pudo dar memoria, se agrega el edge*/
-	if (edarr->edges != NULL){
+	if (aux_ptr != NULL){
+		edarr->edges = aux_ptr;
 		edarr->edges[edarr->counter] = xy;
 		edarr->counter++;
 	/* mayday mayday! destruir todo (o dejar como estaba???)*/
