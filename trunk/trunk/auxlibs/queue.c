@@ -74,7 +74,6 @@ queue dequeue(queue tail){
 alpha first(queue tail){
 	
 	return(tail->fst->elem);
-typedef struct nodeSt *node;
 }
 
 bool is_empty(queue tail){
