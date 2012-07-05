@@ -92,7 +92,7 @@ int LeerUnLado(EstadoNetwork net){
 			/*aca tmb falta chequear q no haya ocurrido error al agregarlo*/
 			edArray_add(net->edarr, xy);
 			/*agregar tmb al array de busqueda*/
-			result = clean;
+			result = 1;
 		/*si se encontro basura, se destruye el lado*/
 		}else if (xy != NULL){
 			edge_destroy(xy);
@@ -112,31 +112,33 @@ int AumentarFlujo(EstadoNetwork net){
 	assert (net != NULL);
 	
 	/*Capaz usemos el TAD queue del AYED2 para los cortes*/
-	aux_cut = new_queue();/*ver si esta funcion se llama asi*/
+	aux_cut = queue_new();/*ver si esta funcion se llama asi*/
 	/*aca podemos devolver error si no hubo memoria para el corte*/
-	
-	do{
-		vertex = head(aux_cut);/*ver bien que pasa con el elem en la cola*/
-		pop(aux_cut);
-		if(vertex != SINK){
-			forward_search(net, vertex);
-			backward_search(net, vertex);
-		}
-	}while (get_size(aux_cut) != 0 && vertex != SINK);
-	
-	if(vertex == SINK){
-		incr_flow(net);
-		result = 1;
+
+	if (aux_cut != NULL){
+		/* se agrega 's' (es 0 en u32)*/
+		enqueue (aux_cut, 0);
+		do{
+			vertex = head(aux_cut);
+			its_ok = forward_search(net, vertex);
+			if (its_ok){
+				its_ok = backward_search(net, vertex);
+			}
+			aux_cut = dequeue(aux_cut);
+		}while (its_ok != FLOW_ERR && queue_length(aux_cut) != 0);
 	}
-	print_verb(net->verb, result);
+
+	if (its_ok != FLOW_ERR){
+		result = increase_flow(net);
+	}else{
+		result = FLOW_ERR;
+	}
 
 	return result;
 }
 
 void ImprimirFlujoMaximal(EstadoNetwork N){
 	u32 *vertice;
-	
-	
 	
 	if(net->verb[1] == 1){
 			printf ("Flujo Maximal:\n");

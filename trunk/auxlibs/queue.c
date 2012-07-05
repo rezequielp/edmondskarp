@@ -18,7 +18,7 @@ struct nodeSt{
 	node next;
 };
 
-queue empty_queue(void){
+queue queue_new(void){
 	
 	queue tail = NULL;/*Creo una cola*/
 	
@@ -71,12 +71,12 @@ queue dequeue(queue tail){
 	return tail;
 }
 
-alpha first(queue tail){
+alpha queue_head(queue tail){
 	
 	return(tail->fst->elem);
 }
 
-bool is_empty(queue tail){
+bool queue_is_empty(queue tail){
 	
 	bool b = false;
 	
@@ -85,7 +85,7 @@ bool is_empty(queue tail){
 	return b;
 }
 
-queue destroy_queue(queue tail){
+queue queue_destroy (queue tail){
 	
 	while(!is_empty(tail)){
 		tail = dequeue(tail);/*Elimino todos los nodos de la cola*/
@@ -96,7 +96,7 @@ queue destroy_queue(queue tail){
 	return tail;
 }
 
-u32 length_queue(queue tail){
+u32 queue_length (queue tail){
 	
 	return(tail->length);
 }

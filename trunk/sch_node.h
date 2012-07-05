@@ -1,11 +1,12 @@
 /* Este TAD es el arreglo de busqueda por nodos, para construir caminos
  * y encontrar los edges rapidamente para aumentar los flujos.
  */
-#ifndef _SEARCH_NODE_H
-#define _SEARCH_NODE_H
+#ifndef _SCH_NODE_H
+#define _SCH_NODE_H
 
 #define SCHARR_OK 1
 #define SCHARR_ERR 0
+
 /* Estructuras del arreglo de busqueda por nodos*/
 typedef struct schArraySt schArray;
 
