@@ -23,10 +23,10 @@ edge *parse_edge(Lexer *input){
 	if (!is_the_next_char(input, ALPHA BLANK)){
 		/*asigno el 1er argumento parseado a 'x'*/
 		its_ok = parse_argument(input, x);
-		if (its_ok){
+		if (its_ok && is_the_next_char(input, WHITE_SPACE)){
 			/*asigno el 2do argumento parseado a 'y'*/
 			its_ok = parse_argument(input, y);
-			if (its_ok){
+			if (its_ok && is_the_next_char(input, WHITE_SPACE)){
 				/*asigno el 3er argumento parseado a 'cap'*/
 				its_ok = parse_argument(input, cap);
 			}
@@ -78,8 +78,8 @@ static int parse_argument (Lexer *input, u32 arg){
 	assert(input != NULL);
 	
 	if (!lexer_is_off (input)){
-		/*leo hasta el siguiente espacio*/
-		barg = next_bstring (input, WHITE_SPACE);
+		/*leo hasta el siguiente caracter distinto de 'DIGIT'*/
+		barg = next_bstring (input, ALPHA BLANK);
 		if (barg != NULL){
 			/* lo convierto a string*/
 			sarg = bstr2cstr (barg, '\0');
@@ -128,6 +128,7 @@ static bstring next_bstring (Lexer *input, const char *str){
 
 
 /*Decide si el siguiente caracter leido pertenece a 'Ch'.
+ * consume el caracter leido
  *Deja el resultado accesible en 'result'*/
 static bool is_the_next_char (Lexer *input, const char *ch){
 
