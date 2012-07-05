@@ -2,7 +2,7 @@
 #include "edge.h"
 
 void xNode_destroy (xNode *xnod);
-static xNode *new_node (edge *xy, u32 n1, u32 n2, flag_s SENSE);
+static xNode *new_node (edge *xy, u32 n1, u32 n2, flag_s DIRECTION);
 static int add_neighbor (edge *ed, u32 nod, yNode *FoBarr, u32 *counter);
 static int insert_node (schArray *scharr, xNode *xnod);
 
@@ -56,7 +56,7 @@ schArray *schArray_new (){
  */
 void schArray_destroy (schArray *scharr){
 	xNode *xnod = NULL;
-	
+
 	assert(scharr != NULL);
 	while (scharr->counter > 0){
 		xnod = scharr->arr[scharr->counter - 1];
@@ -76,7 +76,7 @@ int schArray_add_edge (schArray *scharr, edge *xy){
 	xNode *bnod = NULL; /* nodo backward del nuevo nodo*/
 	u32 x; /*nombre del nodo x*/
 	u32 y; /*nombre del nodo y*/
-	
+
 	assert (xy != NULL);
 
 	x = edge_get_x(xy);
@@ -139,28 +139,28 @@ void xNode_destroy (xNode *xnod){
 /* Crea un nuevo nodo principal (xNode). Agrega su vecino segun el sentido
  * de direccion establecido. Devuelve NULL en caso de error
  */
-xNode *new_node (edge *xy, u32 n1, u32 n2, flag_s SENSE){
+xNode *new_node (edge *xy, u32 n1, u32 n2, flag_s DIRECTION){
 	int status = SCHARR_ERR;
 	xNode *xnod = NULL;
-	
+
 	assert (xy != NULL);
 	xnod = (xNode *) malloc(sizeof(struct xNodeSt));
 	/* Se guarda 'x' y se intenta agregar 'y' segun el sentido establecido*/
 	if (xnod != NULL){
 		xnod->x = n1;
-		if (SENSE == FORWARD){
+		if (DIRECTION == FORWARD){
 			status = add_neighbor(xy, n2, xnod->Farr, &xnod->Fcounter);
-		}else if (SENSE == BACKWARD){
+		}else if (DIRECTION == BACKWARD){
 			status = add_neighbor(xy, n1, bnod->Barr, &bnod->Bcounter);
 		}
-		
+
 	}
 	/* se dio memoria, pero ocurrio algun otro error*/
 	if (xnod != NULL && status = SCHARR_ERR) free(xnod);
-	
+
 	return xnod;
 }
-			
+
 /* Agrega un vecino al arreglo Farr (Barr).
  * Devuelve un estado de error, SCHARR_ERR o SCHARR_OK
  */
@@ -168,10 +168,10 @@ int add_neighbor (edge *ed, u32 nod, yNode *FoBarr, u32 *counter){
 	int status = SCHARR_ERR;
 	size_t new_size;
 	yNode *tmp_yNod;
-	
+
 	assert (ed != NULL);
 	assert (FoBarr != NULL);
-	
+
 	new_size = (xnod->Fcounter + 1) * sizeof(struct yNodeSt);
 	tmp_yNod = (yNode *) realloc(FoBarr, new_size);
 	/* Si se le pudo dar mas memoria, se guarda 'y' en FoBarr*/
@@ -182,7 +182,7 @@ int add_neighbor (edge *ed, u32 nod, yNode *FoBarr, u32 *counter){
 		counter = *counter + 1;
 		status = SCHARR_OK;
 	}
-	
+
 	return status;
 }
 
@@ -196,7 +196,7 @@ int insert_node (schArray *scharr, xNode *xnod){
 
 	assert (scharr != NULL);
 	assert (xnod != NULL);
-	
+
 	new_size = scharr->counter * sizeof(struct xNodeSt);
 	tmp_schArr = (schArray *) realloc (scharr->xarr, new_size);
 	if (tmp_schArr != NULL){

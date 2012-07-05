@@ -16,12 +16,12 @@ typedef bool flag_s;
 
 /*la estructura del edge por lo pronto esta formada por 4 enteros u32 de manera
  *u32 x,u32 y, u32 cap,u32 flujo capaz se le agregue algo mas.
- * (le agregue el tipo sense que indica para que sentido se envia el flujo)
+ * (le agregue el tipo direction que indica para que sentido se envia el flujo)
  *adArray esta formado por "array of edge" llamado edArray y un u32 counter
  * -El edArray es un arreglo que tiene las aristas del network donde
  *   el orden de los elementos esta dado por el orden en el cual se ingresaron.
  * -El counter representa la cantidad de aristas que se agregaron al network.
- *es muy importante no cambiar esto porque en el network hay un arreglo 
+ *es muy importante no cambiar esto porque en el network hay un arreglo
  *con indices de este arreglo, si se agrega un elemento en el medio del arreglo
  *de aristas se defasan los indices que le siguen y no anda nada
  */
@@ -47,13 +47,13 @@ void edge_destroy (edge *xy);
  edge_increase_flow (edge *xy, u32 flow);
 
 /* Setea el sentido del edge en el que se va a correr flujo*/
-void edge_set_sense (edge *xy, flag_s FLAG)
+void edge_set_direction (edge *xy, flag_s FLAG)
 
 
 /**********************consultas sobre edge***********************************/
 
 /* Devuelve el sentido del edge en el que se va a correr flujo*/
-flag_s edge_get_sense (edge *xy);
+flag_s edge_get_direction (edge *xy);
 
 /* Devuelve el nombre del nodo 'x' del edge*/
 u32 edge_get_x (edge *xy);
