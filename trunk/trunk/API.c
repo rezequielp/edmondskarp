@@ -20,8 +20,6 @@ struct ENetwork{
 	search_node * sNodes/*arreglo de busqueda*/
 };
 
-
-
 /*Agrega la verbosidad al network
  * verbosidades validas: (0,1,2,10,11,12,100,101,102,110,111,112)
  * Pre: net != NULL
@@ -129,6 +127,7 @@ int AumentarFlujo(EstadoNetwork net){
 	}
 
 	if (its_ok != FLOW_ERR){
+		/*Aca falta ver si t pertenece al corte!*/
 		result = increase_flow(net);
 	}else{
 		result = FLOW_ERR;
@@ -149,19 +148,37 @@ void ImprimirFlujoMaximal(EstadoNetwork N){
 	}
 	printf ("Valor flujo maximal: %i\n", net->vflow);
 }
+
 void forward_search(ENetwork Net, int x){
-	for(los vecinos que entran en x y que pertenecen al corte){
-		if(flujo(x,q)< capacidad(x,q)){
-			Q[Net.Next] = q
-			S = {q} U S;
-			a(q) = x
-			E(q) = min(E(x), cap(x,q)-flujo(x,q))
-			l(q) = 1
+	
+	/*belongs(creo la funcion en cola)*/
+	for(q:pertenece a R+ && !belongs(S,q)){
+		if(flow(x,q)< cap(x,q)){
+			/*Agregar q a Q?*/
+			Q = enqueue(Q,q);
+			/*Pongo q,x entonces tengo el ancestro de q, hay que modificar cola*/
+			/*Aca tambien se puede agregar el sentido!*/
+			S = enqueue(S,q,x,1);
+			/*a(q) = x*/
+			E(q) = min(E(x), cap(x,q)-flujo(x,q));
+			/*l(q) = 1*/
 		}
 	}
 }
-void backward_search(ENetwork Net, int x);{
+
+void backward_search(ENetwork Net, int x){
 	
+	/*belongs(creo la funcion en cola)*/
+	for(q:pertenece a R- && !belongs(S,q)){
+		if(flow(q,x)>0){
+			/*Agregar q a Q?*/
+			Q = enqueue(Q,q);
+			/*Pongo q,x entonces tengo el ancestro de q, hay que modificar cola*/
+			/*Aca tambien se puede agregar el sentido!*/
+			S = enqueue(S,q,x,-1);
+			/*a(q) = x*/
+			E(q) = min(E(x), flujo(q,x));
+			/*l(q) = -1*/
+		}
+	}
 }
-
-
