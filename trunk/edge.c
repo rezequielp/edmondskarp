@@ -8,7 +8,7 @@ struct edgeSt{
 	u32 y;
 	u32 cap;
 	u32 flow;
-	flag_s sense;
+	flag_s direction;
 };
 
 struct edArraySt{
@@ -30,7 +30,7 @@ edge *edge_new (u32 nod1, u32 nod2, u32 capacity){
 		xy->y = nod2;
 		xy->cap = capacity;
 		xy->flow = 0;
-		xy->sense = FORWARD;
+		xy->direction = FORWARD;
 	}
 	/*agregar errno*/
 	return xy;
@@ -54,9 +54,9 @@ int increase_flow (edge xy, int flow){
 
 /* Setea el sentido del edge en el que se va a correr flujo
  */
-void edge_set_sense (edge *xy, flag_s FLAG){
+void edge_set_direction (edge *xy, flag_s FLAG){
 	assert (xy != NULL);
-	xy->sense = FLAG;
+	xy->direction = FLAG;
 }
 
 
@@ -64,9 +64,9 @@ void edge_set_sense (edge *xy, flag_s FLAG){
 
 /* Devuelve el sentido del edge en el que se va a correr flujo
  */
-flag_s edge_get_sense (edge *xy){
+flag_s edge_get_direction (edge *xy){
 	assert (xy != NULL);
-	return xy->sense;
+	return xy->direction;
 }
 
 /* Devuelve el nombre del nodo 'x' del edge*/
@@ -119,7 +119,7 @@ edArray *edArray_new(){
 		edarr->counter = 0;
 	}
 	/*aca va un errno*/
-	
+
 	return edarr;
 }
 
@@ -127,7 +127,7 @@ edArray *edArray_new(){
  */
 void edArray_destroy (edArray *edarr){
 	assert(edarr != NULL);
-	
+
 	/*Destruyo todos los edges que contiene*/
 	while (edarr->counter > 0){
 		edge_destroy(edarr->edges[counter-1]);
@@ -141,7 +141,7 @@ void edArray_destroy (edArray *edarr){
 void *edArray_add_edge (edArray *edarr, edge *xy){
 	size_t new_size;
 	u32 * aux_ptr;
-	
+
 	assert(edarr != NULL);
 	assert(xy != NULL);
 	/* Se (re)alloquea el arreglo (adiciona memoria)*/
@@ -173,12 +173,12 @@ u32 edArray_size(edArray *edarr){
  */
 edge *edArray_item(edArray *edarr, u32 i){
 	edge *xy = NULL;
-	
+
 	assert(edarr != NULL);
 	if (i < edarr->counter){
 		xy = edarr->edges[i];
 	}
-	
+
 	return xy;
 }
 
