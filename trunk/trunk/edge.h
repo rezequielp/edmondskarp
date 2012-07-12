@@ -47,7 +47,7 @@ void edge_destroy (edge *xy);
  edge_increase_flow (edge *xy, u32 flow);
 
 /* Setea el sentido del edge en el que se va a correr flujo*/
-void edge_set_direction (edge *xy, flag_s FLAG)
+void edge_set_direction (edge *xy, flag_s FLAG);
 
 
 /**********************consultas sobre edge***********************************/

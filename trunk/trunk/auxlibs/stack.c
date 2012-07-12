@@ -1,5 +1,6 @@
 #include "Stack.h"
 #include <stdlib.h>
+#include <stdio.h>
 #include "error.h"
 #include <assert.h>
 
@@ -8,10 +9,13 @@ typedef struct sNode *node;
 struct sStack{
 	node fst;
 	node lst;
+	unsigned int length;
 };
 
 struct sNode{
-	alpha elem;
+	alpha vertex;
+	alpha ancestor;
+	unsigned int line;
 	node tail;
 };
 
@@ -25,13 +29,19 @@ Stack stk_empty(void){
 	return s;
 }
 
-void stk_push(alpha e, Stack s){
+void stk_push(alpha vertex, alpha ancestor, unsigned int line, Stack s);
 	node r;
 	assert(s!=NULL);
 	r = (node) malloc(sizeof (struct sNode));
 	if (r==NULL)
      		err(EXIT_FAILURE, ERRFMT, "stk_push",__LINE__);
-	r->elem = e;
+	r->vertex = vertex;
+	r->ancestor = ancestor;
+	if(line == FORWARD || line == BACKWARD){
+		r->line = line;
+	}else{
+		printf("Valor invalido\n");
+	}
 	r->tail = s->fst;
 	s->fst = r;
 	if (s->lst==NULL)
