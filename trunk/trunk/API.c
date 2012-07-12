@@ -7,10 +7,12 @@
 #include <assert.h>
 #include "search_node.h>
 
+#define MIN(x,y) (x)<(y) ? (x) : (y)
 
 static bool add_verbose (EstadoNetwork net, int verbose);
 static void forward_search(ENetwork N, int x);
 static void backward_search(ENetwork N, int x);
+increase_flow();
 
 struct ENetwork{
 	int verb[3]; /*verbosidad*/
@@ -113,7 +115,9 @@ int AumentarFlujo(EstadoNetwork net){
 	
 	aux_cut = queue_new();
 	aux_stk = stk_empty();
-
+	
+	net->cap_road = MAX_NUMBER;
+	
 	/* se agrega 's' (es 0 en u32)*/
 	aux_cut = enqueue(aux_cut, 0);
 	aux_stk = (aux_stk, 0, 0, 1);
@@ -151,8 +155,8 @@ void ImprimirFlujoMaximal(EstadoNetwork N){
 
 void forward_search(ENetwork Net, u32 x, queue Q, stack S){
 	
-	u32 q;
-	u32 err;
+	u32 q = 0;
+	u32 err = 0;
 	u32 i = 0;
 	u32 size = 0;
 	edArryay *edges = NULL;
@@ -173,21 +177,37 @@ void forward_search(ENetwork Net, u32 x, queue Q, stack S){
 			S = enqueue(S,q,x,FORWARD);
 			/*Veo si la capacidad del camino debe o no ser modificada*/
 			/**/
-			Net->cap_road = min(Net->cap_road, capacity(edges[i])-flow(edges[i]));
+			Net->cap_road = MIN(Net->cap_road, capacity(edges[i])-flow(edges[i]));
 		}
 	}
+	edArray_destroy (edges);
 }
 
 void backward_search(ENetwork Net, u32 x, queue Q, stack S){
 	
-	/*belongs(creo la funcion en cola)*/
-	for(q:pertenece a R- && !belongs(S,q)){
-		if(edge_saturated (edge *xy, BACKWARD)){
-			/*Agregar q a Q?*/
+	u32 q = 0;
+	u32 err = 0;
+	u32 i = 0;
+	u32 size = 0;
+	edArryay *edges = NULL;
+	
+	err = schArray_list_edge(x,BACKWARD,edges);
+	size = edArray_size(edges);
+	
+	for(i=0; i < size; i++){
+		q = edge_get_y(edges[i]);
+		if(!belongs(S,q) && !edge_saturated(edges[i], BACKWARD)){
+			/*Agregar q a Q*/
 			Q = enqueue(Q,q);
-			/*Pongo q,x entonces tengo el ancestro de q, hay que modificar cola*/
-			S = enqueue(S,q,x,-1);
-			Net->cap_camino = min(Net->cap_camino, flujo(q,x));
+			/*S es la pila*/
+			/*q es el vertice*/
+			/*x es el ancestro*/
+			/*FORWARD es el sentido*/
+			S = enqueue(S,q,x,BACKWARD);
+			/*Veo si la capacidad del camino debe o no ser modificada*/
+			/**/
+			Net->cap_road = MIN(Net->cap_road, flow(edges[i]));
 		}
 	}
+	edArray_destroy (edges);
 }
