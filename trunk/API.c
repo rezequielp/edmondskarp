@@ -16,8 +16,9 @@ struct ENetwork{
 	int verb[3]; /*verbosidad*/
 	u32 vflujo; /*valor del flujo del network(auxiliar o no)*/
 	edArray edarr;
-	u32 * cut; /*corte*/
-	search_node * sNodes/*arreglo de busqueda*/
+	u32 * cut_S; /*corte*/
+	search_node * sNodes;/*arreglo de busqueda*/
+	u32 cap_road;/*para saber la capacidad maxima del camino actual*/
 };
 
 /*Agrega la verbosidad al network
@@ -47,7 +48,7 @@ EstadoNetwork networkNuevo(int Verbosidad){
 	net = (EstadoNetwork) malloc(sizeof(EstadoNetworkSt));
 	if (net != NULL)){
 			net->edarr= edArray_new();
-			net->cut = new_queue();/*ver si se llama asi la funcion*/
+			net->cut = stk_empty();/*ver si se llama asi la funcion*/
 			net->vflujo = 0;
 			if (net->edarr == NULL  || !add_verbose(net, Verbosidad){
 				chauNetwork(net);
@@ -90,6 +91,7 @@ int LeerUnLado(EstadoNetwork net){
 			/*aca tmb falta chequear q no haya ocurrido error al agregarlo*/
 			edArray_add(net->edarr, xy);
 			/*agregar tmb al array de busqueda*/
+			/* result es 1 si se agrego bien en los arreglos*/
 			result = 1;
 		/*si se encontro basura, se destruye el lado*/
 		}else if (xy != NULL){
@@ -98,7 +100,7 @@ int LeerUnLado(EstadoNetwork net){
 		lexer_destroy(input);
 	}
 	
-return result;
+	return result;
 }
 
 int AumentarFlujo(EstadoNetwork net){
@@ -109,26 +111,24 @@ int AumentarFlujo(EstadoNetwork net){
 	
 	assert (net != NULL);
 	
-	/*Capaz usemos el TAD queue del AYED2 para los cortes*/
-	aux_cut = queue_new();/*ver si esta funcion se llama asi*/
-	/*aca podemos devolver error si no hubo memoria para el corte*/
+	aux_cut = queue_new();
+	aux_stk = stk_empty();
 
-	if (aux_cut != NULL){
-		/* se agrega 's' (es 0 en u32)*/
-		enqueue (aux_cut, 0);
-		do{
-			vertex = head(aux_cut);
-			its_ok = forward_search(net, vertex);
-			if (its_ok){
-				its_ok = backward_search(net, vertex);
-			}
-			aux_cut = dequeue(aux_cut);
-		}while (its_ok != FLOW_ERR && queue_length(aux_cut) != 0);
-	}
+	/* se agrega 's' (es 0 en u32)*/
+	aux_cut = enqueue(aux_cut, 0);
+	aux_stk = (aux_stk, 0, 0, 1);
+	do{
+		vertex = head(aux_cut);
+		its_ok = forward_search(net, vertex, aux_cut, aux_stk);
+		its_ok = backward_search(net, vertex, aux_cut, aux_stk);
+		aux_cut = dequeue(aux_cut);
+		
+	}while (its_ok != FLOW_ERR && !queue_is_empty(aux_cut));
 
 	if (its_ok != FLOW_ERR){
-		/*Aca falta ver si t pertenece al corte!*/
-		result = increase_flow(net);
+		if(stk_top_vertex(aux_stk) == 1){
+			result = increase_flow(/*ver*/);
+		}else/*ver*/
 	}else{
 		result = FLOW_ERR;
 	}
@@ -149,36 +149,45 @@ void ImprimirFlujoMaximal(EstadoNetwork N){
 	printf ("Valor flujo maximal: %i\n", net->vflow);
 }
 
-void forward_search(ENetwork Net, int x){
+void forward_search(ENetwork Net, u32 x, queue Q, stack S){
 	
-	/*belongs(creo la funcion en cola)*/
-	for(q:pertenece a R+ && !belongs(S,q)){
-		if(flow(x,q)< cap(x,q)){
-			/*Agregar q a Q?*/
+	u32 q;
+	u32 err;
+	u32 i = 0;
+	u32 size = 0;
+	edArryay *edges = NULL;
+	
+	err = schArray_list_edge(x,FORWARD,edges);
+	size = edArray_size(edges);
+	
+	
+	for(i=0; i < size; i++){
+		q = edge_get_y(edges[i]);
+		if(!belongs(S,q) && !edge_saturated(edges[i], FORWARD)){
+			/*Agregar q a Q*/
 			Q = enqueue(Q,q);
-			/*Pongo q,x entonces tengo el ancestro de q, hay que modificar cola*/
-			/*Aca tambien se puede agregar el sentido!*/
-			S = enqueue(S,q,x,1);
-			/*a(q) = x*/
-			E(q) = min(E(x), cap(x,q)-flujo(x,q));
-			/*l(q) = 1*/
+			/*S es la pila*/
+			/*q es el vertice*/
+			/*x es el ancestro*/
+			/*FORWARD es el sentido*/
+			S = enqueue(S,q,x,FORWARD);
+			/*Veo si la capacidad del camino debe o no ser modificada*/
+			/**/
+			Net->cap_road = min(Net->cap_road, capacity(edges[i])-flow(edges[i]));
 		}
 	}
 }
 
-void backward_search(ENetwork Net, int x){
+void backward_search(ENetwork Net, u32 x, queue Q, stack S){
 	
 	/*belongs(creo la funcion en cola)*/
 	for(q:pertenece a R- && !belongs(S,q)){
-		if(flow(q,x)>0){
+		if(edge_saturated (edge *xy, BACKWARD)){
 			/*Agregar q a Q?*/
 			Q = enqueue(Q,q);
 			/*Pongo q,x entonces tengo el ancestro de q, hay que modificar cola*/
-			/*Aca tambien se puede agregar el sentido!*/
 			S = enqueue(S,q,x,-1);
-			/*a(q) = x*/
-			E(q) = min(E(x), flujo(q,x));
-			/*l(q) = -1*/
+			Net->cap_camino = min(Net->cap_camino, flujo(q,x));
 		}
 	}
 }
