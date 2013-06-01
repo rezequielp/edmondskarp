@@ -44,7 +44,7 @@ edge *parse_edge(Lexer *input){
 /* Consume el fin de línea.
  * Indica si encontro basura antes del fin de línea*/
 int parse_next_line (Lexer *input){
-	bool result = PARSER_OK; /*si es EOF (o el sig char es '\n'), sera true*/
+	int result = PARSER_OK; /*si es EOF (o el sig char es '\n'), sera true*/
 	bstring taken = NULL; /*caracteres leidos*/
 	
 	/*Pre:*/
