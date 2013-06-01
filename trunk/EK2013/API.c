@@ -1,25 +1,34 @@
+#include "API.h"
 #include <stdlib.h>
 #include "constants.h"/*s=0, t=1*/
 
-struct NetworkSt{
-    u64 maxFlow; /*valor del flujo del network*/
-    edgeArray edgeArr; /*Arreglo de (x, y, c) no ordenados*/
-    sVertices * minCut; /*search vertice tree.corte*/
-    sNodes * schNode;/*search node tree. busqueda con vecinos Fordward y Backwad*/
-    u32 temp_cap;/*para saber la capacidad minima del camino actual*/
-    int whereWeAre[3];/*[flujo maximal?, llego a t?, aumento flujo?]*/
-};
 
-DragonP dragon_rise(){
-    DragonP dragon = NULL;
-    dragon = (DragonP) malloc(sizeof(NetworkSt));
+/*Estructura del network*/
+typedef struct NetworkSt{
+    SNodes network;     /*El network en forma de arbol binario de busqueda*/
+    u64 flow;           /*Valor del flujo del network*/
+    SPNodes cut;        /*Un abb de punteros a nodos para el corte*/
+    Stack way;          /*Camino en forma de pila*/
+    u64 tempFlow;       /*Cant de flujo a aumentar (cap min del camino actual)*/
+    int whereWeAre[3];  /*[¿flujo maximal?, ¿llego a t?, ¿aumento flujo?]*/
+} DragonSt;
+
+
+/* Constructores y destructores de datos */
+
+DragonP NuevoDragon(){
+    DragonP dragon = NULL; /*Nuevo network*/
+    
+    dragon = (DragonP) malloc(sizeof(DragonSt));
+    /*Nos prevenimos de que no se haya dado memoria*/
     if (dragon != NULL)){
-            dragon->maxFlow = 0;
-            dragon->minCut = stack_new();
-            dragon->edgeArr = edgeArray_new();
-            dragon->schNode = sNode_new();
-            if (dragon->edgeArr == NULL || dragon->schNode == NULL){
-                dragon_slayer(dragon);
+            dragon->network = snodes_new();
+            dragon->flow = 0;
+            dragon->cut = spnodes_new();
+            dragon->way = NULL;
+            /*Si no se le asigno memoria a algo, liberamos todo lo anterior*/
+            if (dragon->network == NULL || dragon->cut == NULL){
+                DestruirDragon(dragon);
                 dragon = NULL;
             }
             dragon->whereWeAre = {0, 0, 0};
@@ -27,46 +36,68 @@ DragonP dragon_rise(){
     return dragon;
 }
 
-void dragon_slayer(dragonP dragon){
+int DestruirDragon(DragonP dragon){
     assert(dragon != NULL);
     
-    if (dragon->edgeArr != NULL){
-        edgeArray_destroy(dragon->edgeArr);
-        dragon->edgeArr = NULL;
+    if (dragon->network != NULL){
+        snodes_destroy(dragon->network);
+        dragon->network = NULL;
     }
-    if(!stack_is_empty(dragon->minCut)){
-        stack_destroy(dragon->minCut);
-        dragon->minCut=NULL;
+    if(!stack_is_empty(dragon->way)){
+        stack_destroy(dragon->way);
+        dragon->way = NULL;
     }
-    if(dragon->schNode != NULL){
-        sNode_destroy(schNode);
-        dragon->schNode = NULL;
+    if(dragon->cut != NULL){
+        spnode_destroy(dragon->cut);
+        dragon->cut = NULL;
     }
     free(dragon);
+    /*En esta funcion nunca ocurre un error, siempre termina bien!*/
+    return 1;
+}
+
+
+/* Cargadores de nuevos datos */
+
+int CargarUnLado(DragonP dragon, u32 x, u32 y, u32 c){
+    int result = 0;
+    
+    /*Hay que programar primero el TAD SNodes*/
+    
+    return result;
 }
 
 int LlenarDragon(DragonP dragon){
-   /*  
- * Lee todos los datos del network donde se correra el algoritmo desde la 
- * entrada estandard y los carga en N usando CargarUnLado() 
- * input:   Network
- * output:  1 si no hubo error,
- *          0 en caso contrario.
-*/
-    edge * xy = NULL;
-    dragon = dragon_rise();
-    if (dragon->rise != NULL){
-        /* Mientras pueda leer un lado lo agrega al arreglo de edges
-         * y al de busquedas. Agregar al arreglo de edges es un side-effect
-         * de CargarUnLado().
-         */
-        while(CargarUnLado(dragon->edgeArr, xy)){
-            sNode_add(dragon->schNode, xy);
+    int result = 1;
+    u32 x, y, c = 0;
+    lexer *input; /*analizador lexico por lineas de un archivo*/
+    int clean;  /*Indica si no se encontro basura al parsear*/
+    
+    assert(dragon != NULL);
+    /*construyo el lexer sobre la entrada estandar*/
+    input = lexer_new(stdin);
+    
+    if (input! = NULL){
+        /*Leo los lados mientras no llegue a un fin de archivo o haya ocurrido
+          algun error*/
+        while (!lexer_is_off(input) && (result != 0)){
+            /*se parsea un lado*/
+            result = parse_edge(input, x, y, c);
+            /*se corre el parseo hasta la siguiente linea (o fin de archivo)*/
+            clean = parse_next_line(input);
+            /*lado bien parseado y no se encontro basura, se agrega al network*/
+            if (result != 0 && clean != 0){
+                result = CargarUnLado(dragon->network, x, y, c);
+            }
         }
+        lexer_destroy(input);
     }
+    return result;
 }
 
-// esta funcion creo que tambien iria en API.c
+
+/* Operadores de calculos y de busqueda */
+
 int ECAML(DragonP dragon){
 /*
  * Busca un camino aumentante de menor longitud (hasta encontrar t) 
@@ -96,20 +127,6 @@ int ECAML(DragonP dragon){
     }
 }
 
-int DondeEstamosParados(DragonP N){
-/*
- * Indica en que estado se encuentra (en curso) el algoritmo para la busqueda
- * de flujo maximal y el camino aumentante de menor longitud (posible corte)
- * input:   Network
- * output:  100*a + 10*b + c donde 'a' indica si es flujo maximal o no,
- *                                 'b' indica si ECAML llego a 't' o no,
- *                                 'c' indica si ECAML actualizo el flujo o no.
- *          1 en caso positivo, 0 en caso negativo.
-*/
-    int *arr;
-    arr = dragon->whereWeAre;
-    return(arr[0]*100 + arr[1]*10 + arr[2]);
-}
 u32 AumentarFlujo(DragonP dragon){
 /*
  * Actualiza el flujo en el network N.
@@ -128,4 +145,41 @@ u32 AumentarFlujo(DragonP dragon){
             
         }
     }
+}
+
+u64 Sumar64(u64 a, u32 b){
+    
+}
+
+
+/* Funciones de consultas */
+
+int DondeEstamosParados(DragonP dragon){
+/*
+ * Indica en que estado se encuentra (en curso) el algoritmo para la busqueda
+ * de flujo maximal y el camino aumentante de menor longitud (posible corte)
+ * input:   Network
+ * output:  100*a + 10*b + c donde 'a' indica si es flujo maximal o no,
+ *                                 'b' indica si ECAML llego a 't' o no,
+ *                                 'c' indica si ECAML actualizo el flujo o no.
+ *          Las variables son 1 en caso positivo y 0 en caso negativo.
+*/
+    int *arr;
+    arr = dragon->whereWeAre;
+    return(arr[0]*100 + arr[1]*10 + arr[2]);
+}
+
+
+/* Impresores */
+
+u32 AumentarFlujoYtambienImprimirCamino(){
+    
+}
+
+void ImprimirFlujo(DragonP N){
+    
+}
+
+void ImprimirCorte(DragonP N){
+    
 }

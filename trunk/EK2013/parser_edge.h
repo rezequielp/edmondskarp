@@ -15,8 +15,8 @@
 #include "auxlibs/lexer.h"
 #include "edge.h"
 
-#define PARSER_OK 1
-#define PARSER_ERR 0
+#define PARSER_OK 0
+#define PARSER_ERR 1
 
 /* Lee todo un edge de `input' hasta llegar a un fin de línea o de archivo
  * Pre:
