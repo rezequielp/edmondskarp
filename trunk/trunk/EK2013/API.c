@@ -4,8 +4,9 @@
 
 
 /*Estructura del network*/
+/*Cuando termina de correr E-K Network->flow es flujo maximal y NetworkSt->cut es corte minimal */
 typedef struct NetworkSt{
-    SNodes network;     /*El network en forma de arbol binario de busqueda*/
+    AbbNet network;     /*El network en forma de arbol binario de busqueda*/
     u64 flow;           /*Valor del flujo del network*/
     SPNodes cut;        /*Un abb de punteros a nodos para el corte*/
     Stack way;          /*Camino en forma de pila*/
@@ -22,7 +23,7 @@ DragonP NuevoDragon(){
     dragon = (DragonP) malloc(sizeof(DragonSt));
     /*Nos prevenimos de que no se haya dado memoria*/
     if (dragon != NULL)){
-            dragon->network = snodes_new();
+            dragon->network = abbNet_create();
             dragon->flow = 0;
             dragon->cut = spnodes_new();
             dragon->way = NULL;
@@ -40,7 +41,7 @@ int DestruirDragon(DragonP dragon){
     assert(dragon != NULL);
     
     if (dragon->network != NULL){
-        snodes_destroy(dragon->network);
+        abbNet_destroy(dragon->network);
         dragon->network = NULL;
     }
     if(!stack_is_empty(dragon->way)){
@@ -62,7 +63,7 @@ int DestruirDragon(DragonP dragon){
 int CargarUnLado(DragonP dragon, u32 x, u32 y, u32 c){
     int result = 0;
     
-    /*Hay que programar primero el TAD SNodes*/
+    /*Hay que programar primero el TAD abbNet*/
     
     return result;
 }
@@ -110,7 +111,7 @@ int ECAML(DragonP dragon){
     result = -1;
     queue Q;
     Q = queue_new(); /*TODO*/
-    s = sNode_search(SOURCE);
+    s = abbNet_search(SOURCE);
     enqueue(Q, s);
     S = vertTree_new();/*TODO*/
     vertTree_add(S, s);/*TODO*/
