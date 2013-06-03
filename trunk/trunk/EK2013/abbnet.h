@@ -24,7 +24,7 @@ void network_add(AbbNet net, Node node);
 bool network_is_empty(AbbNet net);
 
 /*busca el elemento key en el arbol y devuelve un puntero al nodo que machea ese key*/
-Node network_search(AbbNet net, u32 key);
+networkNode network_search(AbbNet net, u32 key);
 
 /*Elimina el elemento key del arbol y libera la memoria del nodo*/
 void network_delete(AbbNet net, u32 key);
