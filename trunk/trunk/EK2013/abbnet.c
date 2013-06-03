@@ -45,9 +45,6 @@ void network_destroy(AbbNet net){
 	}
 }
 
-void networkNode_set(){
-	
-}
 
 /*Agrega el nodo al arbol
 */
