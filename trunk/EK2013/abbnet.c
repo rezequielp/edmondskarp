@@ -37,6 +37,8 @@ struct AbbNetSt{
 
 /*FUNCIONES ESTATICAS*/
 static void network_adjust(Abbnet net);
+static void network_newFreeSpot(AbbNet net);
+
 
 /*
 *			Herramientas para trabajar con AbbNet
@@ -74,9 +76,13 @@ void network_destroy(AbbNet net){
 /*Agrega el nodo al arbol*/
 void network_add(AbbNet net, Node node){
 	STACK_CURRENT(net->freeSpot) = & node;
+	net->cant+=1;
 	STACK_POP(net->freeSpot);
 	/*Buscar el camino al nuevo freeSpot*/
+	network_adjust(net);
+	network_newFreeSpot(net);
 }
+
 
 
 /*Chequea si el net esta vacio. Retorna false si tiene elementos y true si esta vacio.*/
@@ -101,3 +107,40 @@ void network_delete(AbbNet net, u32 key){
 void network_adjust(Abbnet net){
 
 }
+
+
+/*
+*			FUNCIONES ESTATICAS
+*/
+/*Busca y almacena en el arbol un nuevo camino a un spot libre*/
+void network_newFreeSpot(AbbNet net){
+	/*Precondicion: network_newFreeSpot() se tiene que llamar  despues de haber agregado un elemento*/
+	networkNode * pivot;
+	networkNode * ancestor;
+	pivot = STACK_CURRENT(net->freeSpot);
+	STACK_POP(net->freespot);
+	assert(pivot->left == Leaf);
+	if(pivote->right != Leaf){
+		if(!STACK_IS_EMPTY(net->freeSpot)){
+			ancestor = STACK_CURRENT(net->freeSpot);
+			/*mientras el hijo derecho del ancestro es el pivote*/
+			while(!STACK_IS_EMPTY(net->freeSpot) && NETWORKNODE_COMPARE(ancestor->right, pivot)){
+				/*sigo subiendo en el arbol*/
+				pivot = ancestor;
+				STACK_POP(net->freespot);
+				ancestor = STACK_CURRENT(net->freeSpot);
+			}
+			/*pude haber salido por que el stack esta vacion o porque ancestor->right != pivot */
+			if(!STACK_IS_EMPTY(net->freeSpot) ){
+				
+			}else{/* not NETWORKNODE_COMPARE(ancestor->right, pivot) */
+			
+			}
+		}
+	}
+}
+
+
+ void network_adjust(Abbnet net){
+ 
+ }
