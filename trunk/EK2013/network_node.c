@@ -40,6 +40,11 @@ networkNode networkNode_create(){
 	node->right = Leaf;
 }
 
+/*setea los valores del nodo*/
+void networkNode_set(/*ver que pasar aca*/){
+
+}
+
 void networkNode_destroy(networkNode netNode){
 	edgeNode_destroy(netNode->edge);
 	free(netNode)
