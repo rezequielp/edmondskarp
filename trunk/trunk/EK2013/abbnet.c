@@ -1,4 +1,6 @@
-/*NECESITO EL TIPO QUEUE PARA HACER LA ELIMINACION DE ELEMENTOS NO RECURSIVA POR EL LIMITE DE RECURCION*/
+#include "network_node.h"
+#include "abbnet.h"
+
 #define Leaf ((networkNode) NULL)
 
 /* El arbol de nodos*/
@@ -6,7 +8,7 @@ struct AbbNetSt{
 	int cant; /*cantidad de nodos en el arbol*/
 	networkNode * tree; /*puntero a la copa del arbol*/
 	Stack freeSpot /*recorrido la copa hasta la ubicacion para agregar un elemento*/
-}AbbNet; /*TODO chequear los nombres de la structura con lo que dice en el .h*/
+}network; /*TODO chequear los nombres de la structura con lo que dice en el .h*/
 
 /*FUNCIONES DEL MODULO*/
 static void network_adjust(Abbnet net);
@@ -15,9 +17,9 @@ static void network_newFreeSpot(AbbNet net);
 
 /*Crea un AbbNet vacio
 */
-AbbNet network_create(){
-	AbbNet net;
-	net= (AbbNet)malloc(sizeof(AbbNetSt));
+network network_create(){
+	network net;
+	net= (network)malloc(sizeof(AbbNetSt));
 	return net;
 }
 
@@ -43,6 +45,9 @@ void network_destroy(AbbNet net){
 	}
 }
 
+void networkNode_set(){
+	
+}
 
 /*Agrega el nodo al arbol
 */
@@ -65,7 +70,7 @@ bool network_isEmpty(AbbNet net){
 
 /*Busca el elemento key en el arbol y devuelve un puntero al nodo que machea ese key
  *si existe, sino devuelve Leaf.*/
-networkNode network_search(AbbNet net, u32 key){
+networkNode network_search(AbbNet net, u32 key){   /*TODO*/
 	networkNode pivot;
 	bool found;
 	pivot = net->tree;
@@ -78,7 +83,9 @@ networkNode network_search(AbbNet net, u32 key){
 			pivot = pivot->right;
 		}
 	}
+	return pivot;
 }
+
 
 
 /*Elimina el elemento key del arbol y libera la memoria del nodo.
