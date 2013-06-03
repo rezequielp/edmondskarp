@@ -31,39 +31,32 @@ typedef struct networkNodeSt{
 /* 
  *						FUNCIONES SOBRE NODOS
 */
-/*
-typedef struct networkNodeSt{
-	edgeNode * edge;
-	networkNode * left;
-	networkNode * rigth;
-}networkNode;
-*/
+
 networkNode networkNode_create(){
 	networkNode net;
 	node = (networkNode) malloc (sizeof(networkNodeSt));
+	node->edge = void edgeNode_create():
 	node->left = Leaf;
 	node->right = Leaf;
 }
 
-void networkNode_destroy(edgeNode netNode){
-	edgeNode_destroy(netNode);
+void networkNode_destroy(networkNode netNode){
+	edgeNode_destroy(netNode->edge);
 	free(netNode)
 }
 /*los nodos se setean una vez y el seteo no se cambia nunca*/
-void networkNode_set(){
-	
-}
+
 bool networkNode_compare(networkNode node1, networkNode node2){
 	return(edge_getX(node1) == edge_getX(node2))
 }
-u32 node_getKey(networkNode node){
+u32 networkNode_getKey(networkNode node){
 	return edge_getX(node->edge);
 }
 
 /* 
  *						FUNCIONES SOBRE edgeNodes
 */
-void edgeNode_create(edgeNode edgeNd){
+edgeNode edgeNode_create(){
 
 }
 void edgeNode_destroy(edgeNode edgeNd){

@@ -11,23 +11,32 @@ typedef struct AbbNetSt * AbbNet
 /*
 * Arboles
 */
-/*crea un arbol vacio, devuelve el puntero al arbol*/
-AbbNet network_create();
+
+/*Crea un AbbNet vacio*/
+AbbNet networkNode_create(void);
+
 
 /*Destruye un arbol y libera toda la memoria de sus elementos*/
-void network_destroy(AbbNet net);
+void networkNode_destroy(edgeNode netNode);
+
+
+/*setea los valores del nodo*/
+void networkNode_set(/*ver que pasar aca*/);
+
 
 /*Agrega el nodo al arbol*/
 void network_add(AbbNet net, Node node);
 
-/*Chequea si el net esta vacio. Retorna false si tiene elementos y true si esta vacio.*/
-bool network_is_empty(AbbNet net);
 
-/*busca el elemento key en el arbol y devuelve un puntero al nodo que machea ese key*/
+/*Devuelve True si esta vacio False sino*/
+bool network_isEmpty(AbbNet net);
+
+
+/*Busca el elemento key en el arbol y devuelve un puntero al nodo que machea ese key*/
 networkNode network_search(AbbNet net, u32 key);
 
-/*Elimina el elemento key del arbol y libera la memoria del nodo*/
-void network_delete(AbbNet net, u32 key);
 
+/*Elimina el elemento key del arbol y libera la memoria del nodo*/
+/*void network_delete(AbbNet net, u32 key);*/ /*no necesario para el proyecto*/
 
 #endif
