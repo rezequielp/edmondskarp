@@ -17,7 +17,7 @@ typedef struct networkNodeSt networkNode;
 /*
  *						FUNCIONES SOBRE edgeNodes
 */
-void edgeNode_create(edgeNode edgeNd);
+edgeNode edgeNode_create();
 void edgeNode_destroy(edgeNode edgeNd);
-void networkNode_set(/*ver que pasar aca*/);
+void networkNode_set(networkNode netNode, u32 x, u32 y, u32 cap);
 u32 edge_getX(edgeNode edge);
