@@ -39,7 +39,8 @@ void network_destroy(AbbNet net){
 		if (pivote.rigth != Leaf)
 			QUEUE_ADD(pivote.rigth);
 		/*elimina pivote*/
-		edgeNode_destroy(pivote);
+		edgeNode_destroy(pivote->edge);
+		free(pivote);
 		QUEUE_POP(elem_list);
 		net->cant -= 1;
 	}
@@ -53,28 +54,30 @@ void network_add(AbbNet net, u32 x, u32 y, u32 cap){
 	networkNode netNodeB;
 	/*agregar como forward*/
 	netNode = networkNode_create();
-	networkNode_set(netNodeF, x, y, cap)
-	STACK_TOP(net->freeSpot) = & node;
+	networkNode_setF(netNodeF, x, y, cap);
 	net->cant+=1;
-	STACK_POP(net->freeSpot);
 	/*Buscar el camino al nuevo freeSpot*/
 	network_adjust(net);
 	network_newFreeSpot(net);
 	/*agregar como backward*/
-	
+	netNodeB = & network_search(net, y)
+	networkNode_setB(netNodeB, x, y, cap)
+	/*Buscar nuevamente el camino al nuevo freeSpot*/
+	network_adjust(net);
+	network_newFreeSpot(net);
 }
 
 
 /*Chequea si el net esta vacio. Retorna false si tiene elementos y true si esta vacio.
 */
 bool network_isEmpty(AbbNet net){
-	return (net->cant == 1)
+	return (net->cant == 0)
 }
 
 
 /*Busca el elemento key en el arbol y devuelve un puntero al nodo que machea ese key
  *si existe, sino devuelve Leaf.*/
-networkNode network_search(AbbNet net, u32 key){   /*TODO*/
+edgeNode network_search(AbbNet net, u32 key){   /*TODO*/
 	networkNode pivot;
 	bool found;
 	pivot = net->tree;
@@ -87,7 +90,7 @@ networkNode network_search(AbbNet net, u32 key){   /*TODO*/
 			pivot = pivot->right;
 		}
 	}
-	return pivot;
+	return pivot->edge;
 }
 
 
