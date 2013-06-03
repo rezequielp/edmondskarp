@@ -1,30 +1,23 @@
 #ifndef STACK_H
 #define STACK_H
 
-#include <stdbool.h>
-#include "Alpha.h"
+typedef struct StackSt *stack;
 
-#define FORWARD 1
-#define BACKWARD -1
 
-typedef struct sStack *Stack;
+stack stack_new (void);
+/*Pila vacia*/
 
-Stack stk_empty(void);
+void stack_destroy(stack p);
+/*Destuctor de pila*/
 
-void stk_push(alpha vertex, alpha ancestor, unsigned int line, Stack s);
+int stack_push(stack p, void elem);
+/*Agrega un elemento*/
 
-alpha stk_top_vertex(Stack s);
+void stack_pop(stack p);
+/*Elimina el ultimo elemento agregado*/
 
-alpha stk_top_ancestor(Stack s);
+int stack_is_empty(stack p);
+/*Consulta si la pila es vacia o no*/
 
-alpha stk_top_line(Stack s);
-
-Stack stk_pop(Stack s);
-
-bool stk_isEmpty(Stack s);
-
-Stack stk_destroy(Stack s);
-
-void stk_bpush (alpha e, Stack s);
-
-#endif
+void stack_top(stack p);
+/*Muestra el ultimo elemento agregado a la pila*/

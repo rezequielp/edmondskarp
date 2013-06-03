@@ -1,102 +1,92 @@
 #include <assert.h>
 #include <stdlib.h>
-#include "alpha.h"
 #include "queue.h"
 
-typedef struct nodeSt *node;
-
-/*Estructura doblemente enlazada, tiene una referencia al primer elemento y otra al ultimo*/
+/* Estructura doblemente enlazada, tiene una referencia al primer elemento 
+ * y otra al ultimo */
 struct queueSt{
-	node fst;
-	node lst;
+	Element *head;
+    Element *tail;
 	u32 length;
 };
 
-/*Estructura que contiene un elemento de tipo alpha y un puntero a la siguiente estructura*/
-struct nodeSt{
-	alpha elem;
-	node next;
-};
+/* Estructura que contiene un elemento y un puntero a la siguiente estructura */
+typedef struct ElementSt{
+	void elem;
+	Element *next;
+}Element;
 
 queue queue_new(void){
 	
-	queue tail = NULL;/*Creo una cola*/
+	queue Q = NULL;
 	
-	tail = calloc(1,sizeof(struct queueSt));
-	assert(tail != NULL);
-	tail->fst = NULL;
-	tail->lst = NULL;
-	tail->length = 0;
-	
-	return tail;
+	Q = (queue *) malloc (sizeof(struct queueSt));
+	if (Q != NULL){
+        Q->head = NULL;
+        Q->tail = NULL;
+        Q->length = 0;
+    }
+	return Q;
 }
 
-queue enqueue(queue tail, alpha q){
+queue queue_enqueue(queue Q, void q){
 	
-	node new = NULL;
+	Element *new = NULL;
 	
-	new = calloc(1,sizeof(struct nodeSt));/*Reservo memoria para un nodo*/
-	assert(new == NULL);/*Compruebo que haya espacio para la memoria pedida*/
-	new->next = NULL;/*Nodo que apunta al siguiente es NULL por que es el ultimo elemento*/
-	new->elem = q/*Guardo q en elem*/
-	if(is_empty){/*Si la cola es vacia hago que fst y lst apunten al mismo nodo*/
-		tail->fst = new;
-		tail->lst = new;
-	}else{/*Si la cola no es vacia se usa solo lst para agregar al final de la lista*/
-		tail->lst->next = new;
-		tail->lst = new;
+	new = (Element*) malloc (sizeof(struct ElementSt));
+	if (new != NULL){
+        new->elem = q;
+        new->next = NULL;
+        if(queue_is_empty(Q)){
+            Q->head = new;
+            Q->tail = Q->head;
+        }else{
+            Q->tail->next = new;
+            Q->tail = new;
+        }
+        Q->length = (Q->length + 1);
+    }
+	return Q;
+}
+
+queue queue_dequeue(queue Q){
+	
+	assert(queue_is_empty(Q));
+	
+	Element *aux = NULL;
+	
+	aux = Q->head;
+	if(Q->tail != NULL){
+		Q->head = Q->head->next;
 	}
-	tail->length = (tail->length + 1);
+	Q->length -= 1;
+	free(aux);
 	
-	return tail;
+	return Q;
 }
 
-queue dequeue(queue tail){
+void queue_head(queue Q){
 	
-	assert(is_empty(tail));
+	return(Q->head->elem);
+}
+
+int queue_is_empty(queue Q){
 	
-	node aux = NULL;
+	return (Q->tail == NULL);
+}
+
+queue queue_destroy (queue Q){
 	
-	aux = tail->fst;
-	if(tail->fst == tail->lst){/*Si hay un solo elemento*/
-		tail->fst = NULL;
-		tail->lst = NULL;
-	}else{/*Si hay mas de un elemento, hago que fst apunte al segundo de la lista*/
-		tail->fst = tail->fst->next;
+	while(!queue_is_empty(Q)){
+		Q = queue_dequeue(Q);
 	}
-	tail->length = (tail->length-1);
-	free(aux);/*Libero la memoria asignada al primer elemento de la cola*/
-	aux = NULL;
+	free(Q);
+	Q = NULL;
 	
-	return tail;
+	return Q;
 }
 
-alpha queue_head(queue tail){
+u32 queue_length (queue Q){
 	
-	return(tail->fst->elem);
-}
-
-bool queue_is_empty(queue tail){
-	
-	bool b = false;
-	
-	b = (tail->lst == NULL);
-	
-	return b;
-}
-
-queue queue_destroy (queue tail){
-	
-	while(!is_empty(tail)){
-		tail = dequeue(tail);/*Elimino todos los nodos de la cola*/
-	}
-	free(tail);
-	tail = NULL;
-	
-	return tail;
-}
-
-u32 queue_length (queue tail){
-	
-	return(tail->length);
+	return (Q->length);
 }

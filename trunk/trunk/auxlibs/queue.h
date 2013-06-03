@@ -1,35 +1,44 @@
 #ifndef QUEUE_H
 #define QUEUE_H
 
-#include "alpha.h"
-
 typedef struct queueSt *queue;
 
-typedef unsigned int u32;
 
-/*Crea una cola vacia*/
 queue queue_new (void);
+/* 
+ * Crea una cola vacia
+*/
 
-/*Agrega un elemento de tipo alpha con el nuevo elemento agregado
- *Devuelve la misma cola con el elemento nuevo agregado
- */
-queue enqueue(queue tail, alpha elem);
+queue queue_enqueue(queue Q, void elem);
+/* 
+ * Agrega un elemento de tipo alpha con el nuevo elemento agregado
+ * Devuelve la misma cola con el elemento nuevo agregado
+*/
 
-/*Elimina el primer elemento que entro a la cola
- *PRE: Q != vacio
- */
-queue dequeue (queue tail);
+queue queue_dequeue (queue Q);
+/*
+ * Elimina el primer elemento que entro a la cola
+ * PRE: Q != vacio
+*/
 
-/*Funcion que muestra el primer elemento que entro a la cola*/
-alpha queue_head (queue tail);
+void queue_head (queue Q);
+/* 
+ *Funcion que muestra el primer elemento que entro a la cola
+*/
 
-/*Funcion que devuelve true o false si la cola es vacia o no respectivamente*/
-bool queue_is_empty (queue tail);
+int queue_is_empty (queue Q);
+/* 
+ *Funcion que devuelve true o false si la cola es vacia o no respectivamente
+*/
 
-/*Libera toda la memoria asignada a Q*/
-queue queue_destroy (queue tail);
+queue queue_destroy (queue Q);
+/* 
+ * Libera toda la memoria asignada a Q
+*/
 
-/*Devuelve el largo de la cola*/
-u32 queue_length (queue tail);
+u32 queue_length (queue Q);
+/* 
+ *Devuelve el largo de la cola
+*/
 
 #endif
