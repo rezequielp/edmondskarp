@@ -1,3 +1,5 @@
+#include "network_node.h"
+#inlcude "../auxlibs/bstring/bstrlib.h"
 
 /* Estructura de un nodo por forward*/
 typedef struct FNodeSt{
@@ -41,25 +43,27 @@ networkNode networkNode_create(){
 }
 
 /*setea los valores del nodo*/
-void networkNode_set(/*ver que pasar aca*/){
-
-}
 
 void networkNode_destroy(networkNode netNode){
 	edgeNode_destroy(netNode->edge);
 	free(netNode)
 }
-/*los nodos se setean una vez y el seteo no se cambia nunca*/
+
+void networkNode_set(networkNode netNode, u32 x, u32 y, u32 cap){
+	edgeNode_set(networkNode edge, u32 x, u32 y, u32 cap);
+}
 
 bool networkNode_compare(networkNode node1, networkNode node2){
 	return(edge_getX(node1) == edge_getX(node2))
 }
+
+
 u32 networkNode_getKey(networkNode node){
 	return edge_getX(node->edge);
 }
 
 /* 
- *						FUNCIONES SOBRE edgeNodes
+ *						FUNCIONES SOBRE EDGES
 */
 edgeNode edgeNode_create(){
 

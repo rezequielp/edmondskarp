@@ -48,13 +48,20 @@ void network_destroy(AbbNet net){
 
 /*Agrega el nodo al arbol
 */
-void network_add(AbbNet net, Node node){
+void network_add(AbbNet net, u32 x, u32 y, u32 cap){
+	networkNode netNodeF;
+	networkNode netNodeB;
+	/*agregar como forward*/
+	netNode = networkNode_create();
+	networkNode_set(netNodeF, x, y, cap)
 	STACK_TOP(net->freeSpot) = & node;
 	net->cant+=1;
 	STACK_POP(net->freeSpot);
 	/*Buscar el camino al nuevo freeSpot*/
 	network_adjust(net);
 	network_newFreeSpot(net);
+	/*agregar como backward*/
+	
 }
 
 
