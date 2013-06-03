@@ -1,13 +1,13 @@
 #include <assert.h>
 #include <stdlib.h>
-#include "queue.h"
+#include "Queue.h"
 
 /* Estructura doblemente enlazada, tiene una referencia al primer elemento 
  * y otra al ultimo */
 struct queueSt{
 	Element *head;
     Element *tail;
-	u32 length;
+	int size;
 };
 
 /* Estructura que contiene un elemento y un puntero a la siguiente estructura */
@@ -16,20 +16,20 @@ typedef struct ElementSt{
 	Element *next;
 }Element;
 
-queue queue_new(void){
+Queue queue_new(void){
 	
-	queue Q = NULL;
+	Queue Q = NULL;
 	
-	Q = (queue *) malloc (sizeof(struct queueSt));
+	Q = (Queue *) malloc (sizeof(struct queueSt));
 	if (Q != NULL){
         Q->head = NULL;
         Q->tail = NULL;
-        Q->length = 0;
+        Q->size = 0;
     }
 	return Q;
 }
 
-queue queue_enqueue(queue Q, void q){
+Queue queue_enqueue(Queue Q, void q){
 	
 	Element *new = NULL;
 	
@@ -44,12 +44,12 @@ queue queue_enqueue(queue Q, void q){
             Q->tail->next = new;
             Q->tail = new;
         }
-        Q->length = (Q->length + 1);
+        Q->size = (Q->size + 1);
     }
 	return Q;
 }
 
-queue queue_dequeue(queue Q){
+Queue queue_dequeue(Queue Q){
 	
 	assert(queue_is_empty(Q));
 	
@@ -59,23 +59,23 @@ queue queue_dequeue(queue Q){
 	if(Q->tail != NULL){
 		Q->head = Q->head->next;
 	}
-	Q->length -= 1;
+	Q->size -= 1;
 	free(aux);
 	
 	return Q;
 }
 
-void queue_head(queue Q){
+void queue_head(Queue Q){
 	
 	return(Q->head->elem);
 }
 
-int queue_is_empty(queue Q){
+int queue_is_empty(Queue Q){
 	
 	return (Q->tail == NULL);
 }
 
-queue queue_destroy (queue Q){
+Queue queue_destroy (Queue Q){
 	
 	while(!queue_is_empty(Q)){
 		Q = queue_dequeue(Q);
@@ -86,7 +86,7 @@ queue queue_destroy (queue Q){
 	return Q;
 }
 
-u32 queue_length (queue Q){
-	
-	return (Q->length);
+int queue_size (Queue Q){	
+    
+	return (Q->size);
 }

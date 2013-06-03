@@ -1,59 +1,89 @@
 #include <assert.h>
 #include <stdlib.h> 
-#include "stack.h"
+#include "Stack.h"
 
 struct StackSt{
-	void elem
-	stack next;
+	Element *top;
+	int size;
 };
 
-stack stack_new (void){
-	stack S = NULL;
-	return stack;
+/* Estructura que contiene un elemento y un puntero a la siguiente estructura */
+typedef struct ElementSt{
+    void elem;
+    Element *next;
+}Element;
+
+
+Stack stack_create (void){
+	Stack S = NULL;
+    S = (Stack) malloc(sizeof(struct StackSt));
+    if (S != NULL){
+        S->top = NULL;
+        S->size = 0;
+    }
+	return S;
 }
 
-void stack_destroy(stack S){
-    while(!stack_is_empty(S)){
+void stack_destroy(Stack S){
+    while(!stack_isEmpty(S)){
         stack_pop(S);
     }
     S = NULL;
 }
 
-/*Agrega un elemento a la pila*/
-int stack_push(stack S, void elem){
-	stack new = NULL;
-    error = 0; /*0 = esta todo OK*/
+int stack_push(Stack S, void elem){
+	Element *new = NULL;
+    result = 0; /*0 = esta todo OK*/
     
-	new = (stack) malloc (sizeof(struct StackSt));
+	new = (Element *) malloc (sizeof(struct ElementSt));
 	if(new != NULL){
-        new->elem = elem;
-        new->next = S;
-        S = new;
-        
+        new->elem = s;
+        new->next = NULL;
+        S->top = new;
+        S->size += 1;
     }else{
         stack_destroy(S);
         S = NULL;
-        error = 1 /*1 es error de memoria*/
+        result = 1 /*1 es error de memoria*/
     }
-	return error;
+	return result;
 }
 
-void stack_pop(stack S){
-	stack aux = NULL;
+void stack_pop(Stack S){
+	Element *aux = NULL;
     
-    assert(!stack_is_empty(S));
+    assert(!stack_isEmpty(S));
     
-	aux = S;
-	S = S->next;
+	aux = S->top;
+	S->top = S->top->next;
+    S->size -= 1; 
 	free(aux);
 	aux = NULL;
 }
 
-int stack_is_empty(stack S){
-	return (S == NULL);
+int stack_isEmpty(Stack S){
+	return (S->size == 0);
 }
 
-/*Devuelve el ultimo yo agregado*/
-void stack_top(stack S){
-    return(S->elem);
+void stack_top(Stack S){
+    return(S->top->elem);
+}
+
+int stack_size(Stack S){
+    return (S->size);
+}
+
+int stack_revert(Stack S1, Stack S2 ){
+    Element *aux = NULL;
+    int result = 1;
+    
+    assert((S1 != NULL) && (S2 != NULL));
+    assert(stack_isEmpty(S2))
+
+    aux = stack_top(S1);
+    while ((stack_size(S1) != stack_size(S2)) && (result != 0)){
+        result = stack_push(S2, aux);
+        aux = aux->next;
+    }
+    return result;
 }
