@@ -1,97 +1,59 @@
-#include "Stack.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include "error.h"
 #include <assert.h>
+#include <stdlib.h> 
+#include "stack.h"
 
-typedef struct sNode *node;
-
-struct sStack{
-	node fst;
-	node lst;
-	unsigned int length;
+struct StackSt{
+	void elem
+	stack next;
 };
 
-struct sNode{
-	alpha vertex;
-	alpha ancestor;
-	unsigned int line;
-	node tail;
-};
-
-Stack stk_empty(void){
-	Stack s;
-	s=(Stack)malloc(sizeof(struct sStack));
-	if (s==NULL)
-     		err(EXIT_FAILURE, ERRFMT, "stk_empty",__LINE__);
-	s->fst=NULL;
-	s->lst=NULL;
-	return s;
+stack stack_new (void){
+	stack S = NULL;
+	return stack;
 }
 
-void stk_push(alpha vertex, alpha ancestor, unsigned int line, Stack s);
-	node r;
-	assert(s!=NULL);
-	r = (node) malloc(sizeof (struct sNode));
-	if (r==NULL)
-     		err(EXIT_FAILURE, ERRFMT, "stk_push",__LINE__);
-	r->vertex = vertex;
-	r->ancestor = ancestor;
-	if(line == FORWARD || line == BACKWARD){
-		r->line = line;
-	}else{
-		printf("Valor invalido\n");
-	}
-	r->tail = s->fst;
-	s->fst = r;
-	if (s->lst==NULL)
-		s->lst=r;
+void stack_destroy(stack S){
+    while(!stack_is_empty(S)){
+        stack_pop(S);
+    }
+    S = NULL;
 }
 
-bool stk_isEmpty(Stack s){
-	assert(s!=NULL);
-	return (s->fst == NULL);
+/*Agrega un elemento a la pila*/
+int stack_push(stack S, void elem){
+	stack new = NULL;
+    error = 0; /*0 = esta todo OK*/
+    
+	new = (stack) malloc (sizeof(struct StackSt));
+	if(new != NULL){
+        new->elem = elem;
+        new->next = S;
+        S = new;
+        
+    }else{
+        stack_destroy(S);
+        S = NULL;
+        error = 1 /*1 es error de memoria*/
+    }
+	return error;
 }
 
-alpha stk_top(Stack s){
-	assert(s!=NULL);
-	return s->fst->elem;
+void stack_pop(stack S){
+	stack aux = NULL;
+    
+    assert(!stack_is_empty(S));
+    
+	aux = S;
+	S = S->next;
+	free(aux);
+	aux = NULL;
 }
 
-Stack stk_pop(Stack s){
-	node r;
-	assert(s!=NULL);
-	r = s->fst;
-	s->fst = s->fst->tail;
-	free(r);
-	if(s->fst==NULL)
-		s->lst=NULL;
-      return s; 
+int stack_is_empty(stack S){
+	return (S == NULL);
 }
 
-Stack stk_destroy(Stack s){
-	
-	if (s!=NULL){
-		while (s->fst!=NULL)
-			s=stk_pop(s);
-		free(s);
-		s=NULL;
-	}
-	return s;
-}
-
-void stk_bpush (alpha e, Stack s){
-	node r;
-	assert(s!=NULL);
-	if (s->lst==NULL)
-		stk_push(e,s);
-	else{
-		r = (node) malloc(sizeof (struct sNode));
-		if (r==NULL)
-	     		err(EXIT_FAILURE, ERRFMT, "stk_bpush",__LINE__);
-		r->elem=e;
-		r->tail=NULL;
-		s->lst->tail=r; 
-		s->lst=r;
-	}
+/*Devuelve el ultimo yo agregado*/
+void stack_top(stack S){
+    return(S->elem);
 }
