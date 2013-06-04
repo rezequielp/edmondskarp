@@ -141,7 +141,7 @@ void network_newFreeSpot	(AbbNet net){
 
 /*Acomoda el nodo en net->freeSpot para que el arbol sea un arbol de busqueda*/
 /*Este nodo no necesariamente esta bien ubicado*/
- void network_adjust(Abbnet net){
+ void network_adjust(Abbnet net){/*TODO*/
  
  }
  

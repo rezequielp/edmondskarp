@@ -63,7 +63,8 @@ int DondeEstamosParados(DragonP N);
  * Input:   Network no nulo
  * Output:  100*a + 10*b + c donde 'a' indica si es flujo maximal o no,
  *                                 'b' indica si ECAML llego a 't' o no,
- *                                 'c' indica si ECAML actualizo el flujo o no.
+ *                                 'c' indica si los resultados de ECAML fueron 
+ *                                       usados para actualizar el flujo o no.
  *          Las variables son 1 en caso positivo y 0 en caso negativo.
 */
 
