@@ -5,10 +5,10 @@
 #include <assert.h>
 
 
-#define KEY_MAX_LENGHT 25
+#define KEY_MAX_LENGHT 25/*modificar*/
 
 struct sKey{
-	char key[KEY_MAX_LENGHT];
+	u32 key;
 	int lenght;
 
 };

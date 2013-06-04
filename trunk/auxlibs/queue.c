@@ -12,11 +12,11 @@ struct queueSt{
 
 /* Estructura que contiene un elemento y un puntero a la siguiente estructura */
 typedef struct ElementSt{
-	void elem;
+	void *elem;
 	Element *next;
 }Element;
 
-Queue queue_new(void){
+Queue queue_create(void){
 	
 	Queue Q = NULL;
 	
@@ -29,9 +29,10 @@ Queue queue_new(void){
 	return Q;
 }
 
-Queue queue_enqueue(Queue Q, void q){
+int queue_enqueue(Queue Q, void q){
 	
 	Element *new = NULL;
+    int result = 1;
 	
 	new = (Element*) malloc (sizeof(struct ElementSt));
 	if (new != NULL){
@@ -45,48 +46,61 @@ Queue queue_enqueue(Queue Q, void q){
             Q->tail = new;
         }
         Q->size = (Q->size + 1);
+        result = 0;
     }
-	return Q;
+	return result;
 }
 
-Queue queue_dequeue(Queue Q){
-	
-	assert(queue_is_empty(Q));
-	
+void *queue_dequeue(Queue Q){
 	Element *aux = NULL;
-	
-	aux = Q->head;
-	if(Q->tail != NULL){
+	void * elem = NULL;
+    assert(Q != NULL && queue_isEmpty(Q));
+    
+	aux = queue_head(Q);
+	if(aux->next != NULL){
 		Q->head = Q->head->next;
-	}
+	}else{
+        Q->head = NULL;
+        Q->tail = NULL;
+    }
+    elem = aux->elem;
+    free(aux);
 	Q->size -= 1;
-	free(aux);
-	
-	return Q;
+	return elem;
 }
 
 void queue_head(Queue Q){
-	
 	return(Q->head->elem);
 }
 
-int queue_is_empty(Queue Q){
-	
+int queue_isEmpty(Queue Q){
 	return (Q->tail == NULL);
 }
 
-Queue queue_destroy (Queue Q){
-	
-	while(!queue_is_empty(Q)){
-		Q = queue_dequeue(Q);
-	}
-	free(Q);
-	Q = NULL;
-	
-	return Q;
+int queue_destroy (Queue Q, void *garbage){
+    int result = -1;
+    int i = 0;
+    int qSize;
+    void * elem;
+    
+    assert(Q != NULL);
+    
+    qSize = queue_size(Q);
+    while(!queue_isEmpty(Q)){
+        elem = queue_dequeue(Q);
+        if(garbage != NULL){
+            garbage[i] = elem;
+        }
+        i ++;
+    }
+    if(qSize == i){
+        result = i;
+        free(Q);
+        Q = NULL;
+    }
+	return result;
 }
 
-int queue_size (Queue Q){	
-    
+int queue_size (Queue Q){
 	return (Q->size);
 }

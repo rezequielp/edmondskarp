@@ -4,12 +4,13 @@
 
 struct StackSt{
 	Element *top;
+    Element *bottom;
 	int size;
 };
 
 /* Estructura que contiene un elemento y un puntero a la siguiente estructura */
 typedef struct ElementSt{
-    void elem;
+    void *elem;
     Element *next;
 }Element;
 
@@ -19,60 +20,109 @@ Stack stack_create (void){
     S = (Stack) malloc(sizeof(struct StackSt));
     if (S != NULL){
         S->top = NULL;
+        S->bottom = NULL;
         S->size = 0;
     }
 	return S;
 }
 
-void stack_destroy(Stack S){
+int stack_destroy(Stack S, void *garbage){
+    int result = -1;
+    int i = 0;
+    int sSize;
+    void * elem;
+    
+    assert(S != NULL);
+    
+    sSize = stack_size(Q);
     while(!stack_isEmpty(S)){
-        stack_pop(S);
+        elem = stack_pop(S);
+        if(garbage != NULL){
+            garbage[i] = elem;
+        }
+        i ++;
     }
-    S = NULL;
+    if(sSize == i){
+        result = i;
+        free(S);
+        S = NULL;
+    }
+    return result;
 }
 
-int stack_push(Stack S, void elem){
+int stack_push(Stack S, void *elem){
 	Element *new = NULL;
-    result = 0; /*0 = esta todo OK*/
+    result = 1; /*0 = esta todo OK*/
     
-	new = (Element *) malloc (sizeof(struct ElementSt));
+	new = (Element *) malloc(sizeof(struct ElementSt));
 	if(new != NULL){
-        new->elem = s;
-        new->next = NULL;
+        new->elem = elem;
+        new->next = S->top;
         S->top = new;
         S->size += 1;
-    }else{
-        stack_destroy(S);
-        S = NULL;
-        result = 1 /*1 es error de memoria*/
+        if (S->bottom == NULL){
+            S->bottom = new;
+        }
+        result = 0;
     }
 	return result;
 }
 
-void stack_pop(Stack S){
-	Element *aux = NULL;
+int stack_bpush (Stack S, void *elem){
+    Element *new = NULL;
+    result = 1;
     
-    assert(!stack_isEmpty(S));
+    assert(S != NULL);
+    if (S->bottom == NULL){
+        result = stack_push(S, elem);
+    }else{
+        new = (Element *) malloc(sizeof(struct ElementSt));
+        if (new != NULL){
+            new->elem = elem;
+            new->next = NULL;
+            S->bottom->next = new;
+            S->bottom = new;
+            S->size += 1;
+            result = 0;
+        }
+    }
+    return result;
+}
+
+void * stack_pop(Stack S){
+	Element *aux = NULL;
+    void * elem = NULL;
+    assert(S != NULL && !stack_isEmpty(S));
     
 	aux = S->top;
-	S->top = S->top->next;
+    if (aux->next != NULL){
+        S->top = S->top->next;
+    }else{ /*caso ultimo elemento*/
+        S->top = NULL;
+        S->bottom = NULL;
+    }
+    elem = aux->elem;
+    free(aux);
     S->size -= 1; 
-	free(aux);
-	aux = NULL;
+	return elem;
 }
 
 int stack_isEmpty(Stack S){
+    assert(S != NULL);
 	return (S->size == 0);
 }
 
-void stack_top(Stack S){
+void *stack_top(Stack S){
+    assert( S != NULL);
     return(S->top->elem);
 }
 
 int stack_size(Stack S){
+    assert( S != NULL);
     return (S->size);
 }
-
+/* CAPAZ NO SE USE (OBSERVACION: OJO CON POP Y DESTROY POR 
+ *TEMA DE MEMORIA)*/
 int stack_revert(Stack S1, Stack S2 ){
     Element *aux = NULL;
     int result = 1;

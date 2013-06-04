@@ -4,31 +4,30 @@
 /* Estructura de un nodo por forward*/
 typedef struct FNodeSt{
     u32 y;      /* El nodo forward de 'x'*/
-    u64 flow;   /* El flujo por forward que se esta enviando*/
-    u64 cap;    /* La capacidad restante de envio de flujo*/
+    u32 flow;   /* El flujo por forward que se esta enviando*/
+    u32 cap;    /* La capacidad restante de envio de flujo*/
 }FNode;
-
-typedef struct fAbb * bAbb
 
 /* Estructura de un nodo por backward*/
 typedef struct BNodeSt{
-    Node * y;    /* Puntero a la direccion de memoria del nodo 'y' en el arbol*/
+    FNode * y;    /* Puntero a la direccion de memoria del nodo 'y' en el arbol*/
 }BNode;
 
 /* Estructura de un nodo*/
-typedef struct edgeNodeSt{
-	u32 x;          /* El nodo en cuestion*/
-	FNode *fArr;    	/* Los nodos vecinos por forward*/
-	u32 fSize;			/*tamaño del arreglo fArr*/
-	BNode *bArr;   	/* Los nodos vecinos por backward*/
-	u32 bSize;		/*tamaño del arreglo bArr*/
-}edgeNode;
+struct edgeNodeSt{
+    u32 x;      /* El nodo en cuestion*/
+    Abb *fAbb;  /* Los nodos vecinos por forward*/
+    Abb *bAbb;  /* Los nodos vecinos por backward*/
+};
 
 typedef struct networkNodeSt{
 	edgeNode * edge;
 	networkNode * left;
 	networkNode * rigth;
 }networkNode;
+
+typedef struct edgeNode * bArr;
+
 
 /* 
  *						FUNCIONES SOBRE NODOS
@@ -49,29 +48,55 @@ void networkNode_destroy(networkNode netNode){
 	free(netNode)
 }
 
-void networkNode_set(networkNode netNode, u32 x, u32 y, u32 cap){
-	edgeNode_set(networkNode edge, u32 x, u32 y, u32 cap);
-}
 
 bool networkNode_compare(networkNode node1, networkNode node2){
 	return(edge_getX(node1) == edge_getX(node2))
 }
 
-
-u32 networkNode_getKey(networkNode node){
-	return edge_getX(node->edge);
-}
-
 /* 
  *						FUNCIONES SOBRE EDGES
 */
+
 edgeNode edgeNode_create(){
-
+    edgeNode edge;
+    
+    edge = (edgeNode)malloc(sizeof(struct edgeNodeSt));
+    if(edge != NULL){
+        edge->fSize = 0;
+        edge->bSize = 0;
+        edge->fArr = NULL;
+        edge->bArr = NULL;
+    }
+    return edge;
 }
-void edgeNode_destroy(edgeNode edgeNd){
 
+void edgeNode_destroy(edgeNode edge){
+    
+    assert(edge != NULL);    
+    while(edge->fSize >= 0){
+        free(edge->fArr[edge->fSize-1]);
+        edge->fSize -= 1;
+    }
+    free(edge->fArr);
+    free(edge->bArr);
+    free(edge);
+    edge = NULL;
 }
 
+ /*GETS/SETS*/
 u32 edge_getX(edgeNode edge){
 	return edge->x;
 }
+
+void edgeNode_set(edgeNode edge, u32 x, u32 y, u32 cap){
+    assert (edge != NULL);
+    
+}
+void edge_setFlow(edgeNode edge,  ){
+    
+}
+
+u32 edge_getX(edgeNode edge);
+u32 edge_getY(edgeNode edge);
+u32 edge_getCap(edgeNode edge);
+u32 edge_getFlow(edgeNode edge);

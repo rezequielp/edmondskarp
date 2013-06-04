@@ -1,15 +1,19 @@
 #include "API.h"
 #include <stdlib.h>
-#include "constants.h"/*s=0, t=1*/
+#include <math.h>
 
+#define SOURCE 0
+#define SINK 1
+#define FORWARD 1
+#define BACKWARD -1
 
 /*Estructura del network*/
 /*Cuando termina de correr E-K Network->flow es flujo maximal y NetworkSt->cut es corte minimal */
 typedef struct NetworkSt{
-    AbbNet network;     /*El network en forma de arbol binario de busqueda*/
+    Abb network;     /*El network en forma de arbol binario de busqueda*/
     u64 flow;           /*Valor del flujo del network*/
-    SPNodes cut;        /*Un abb de punteros a nodos para el corte*/
-    Stack way;          /*Camino en forma de pila*/
+    Abb cut;            /*Un abb de punteros a nodos para el corte*/
+    queue way;        /*Camino en forma de un flujo de caracteres*/
     u64 tempFlow;       /*Cant de flujo a aumentar (cap min del camino actual)*/
     int whereWeAre[3];  /*[¿flujo maximal?, ¿llego a t?, ¿aumento flujo?]*/
 } DragonSt;
@@ -23,16 +27,16 @@ DragonP NuevoDragon(){
     dragon = (DragonP) malloc(sizeof(DragonSt));
     /*Nos prevenimos de que no se haya dado memoria*/
     if (dragon != NULL)){
-            dragon->network = abbNet_create();
+            dragon->network = abb_create();
             dragon->flow = 0;
-            dragon->cut = spnodes_new();
+            dragon->cut = NULL;
             dragon->way = NULL;
+            dragon->whereWeAre = {0, 0, 0};
             /*Si no se le asigno memoria a algo, liberamos todo lo anterior*/
             if (dragon->network == NULL || dragon->cut == NULL){
                 DestruirDragon(dragon);
                 dragon = NULL;
             }
-            dragon->whereWeAre = {0, 0, 0};
     }
     return dragon;
 }
@@ -61,9 +65,16 @@ int DestruirDragon(DragonP dragon){
 /* Cargadores de nuevos datos */
 
 int CargarUnLado(DragonP dragon, u32 x, u32 y, u32 c){
+    EdgeNode edge;
     int result = 0;
     
-    /*Hay que programar primero el TAD abbNet*/
+    assert(dragon != NULL);
+    
+    edge = edgeNode_create();
+    if (edge != NULL){   
+        edgeNode_set(x, y, c);
+        result = network_add(dragon, edge);
+    }
     
     return result;
 }
@@ -108,42 +119,124 @@ int ECAML(DragonP dragon){
  *          0 si no llega a t,
  *         -1 si ocurrio error.
 */
+    EdgeNode s = NULL;
+    Queue Q = NULL;
+    error = 1;
     result = -1;
-    queue Q;
-    Q = queue_new(); /*TODO*/
-    s = abbNet_search(SOURCE);
-    enqueue(Q, s);
-    S = vertTree_new();/*TODO*/
-    vertTree_add(S, s);/*TODO*/
-    while(!queue_is_empty(Q) || queue_head(Q)!= t){
-        forward_search(Q, S);
-        backward_search(Q, S);
-        dequeue(Q);
+    CutNode cutNode;
+    assert(dragon != NULL);
+    
+    Q = queue_create();
+    if (Q != NULL){
+        if (dragon->cut != NULL){
+            abb_destroy(dragon->cut, NULL);
+        }
+        dragon->cut = abb_create();
+        /*si no hubo problema para crear*/
+        if (dragon->cut != NULL){
+            s = abb_search(Abb dragon->network, SOURCE);
+            /*clavo un assert porque la busqueda siempre devuelve un edge
+             * valido, sino algo hicimos mal*/
+            assert(s != NULL);
+            error = queue_enqueue(Q, s);
+            if (error != 1){
+                /*caso especial del tipo cutNode*/
+                cutNode = cutNode_create(SOURCE, s, 0);
+                if(cutNode != NULL){
+                    error = abb_add(dragon->cut, CutNode);
+                }else{
+                    error = -1;
+                }
+                if (error != 1){
+                    while ((!queue_isEmpty(Q) || queue_head(Q)!= SINK) 
+                            && error != 1){
+                        error = forward_search(Q, dragon->cut);
+                        if (error != 1){
+                            error = backward_search(Q, dragon->cut);
+                            queue_dequeue(Q);
+                        }
+                    }
+                    if (error != 1){
+                        if (abb_exists(dragon->cut, SINK)){
+                            cutToWat(dragon);
+                            
+                            
+                            cutPivot = abb_search(dragon->cut, SINK)
+                            flow = edge_getFlow(cutPivot->edge, SINK, cutPivot->direction);
+                            bconchar(dragon->way, bfromcstr('t'))
+                            /*mientras no lleguemos a SOURCE*/
+                            while (cutPivot->edge != NULL){
+                                /*Buscamos quien agrego a este elem*/
+                                son = edge_getX(pivot->edge)
+                                cutPivot = abb_search(dragon->cut, son);
+                                if(cutPivot->direction == FORWARD){    
+                                    flow = fmin(flow, edge_getFlow(cutPivot->edge, son, FORWARD));
+                                }else{/*BACKWARD*/
+                                    flow = fmin(flow, edge_getFlow(cutPivot->edge, son, BACKWARD));
+                                }
+                            result = 1;
+                        }else{
+                            result = 0;
+                        }
+                    }
+                }
+            }
+        }
+        dequeue_destroy(Q);
     }
-    if(vertTree_exists(S, t)){/*TODO*/
-        result = 1
-    }else{
-        /*encontrar corte*//*TODO*/
-        result = 0
+    return result;
+}
+}
+/*Pre: t pertenece al corte*/
+int cutToWay(Dragon dragon){
+    Abb cut;
+    CutNode cutNode;
+    u32 ancestor;
+    int wSize = 0;
+    int wSizeNew = 0;
+    int result = 1;
+    
+    assert(dragon != NULL);
+    
+   
+    cut = dragon->cut;
+    
+    if(dragon->way != NULL){ 
+        wSize = stack_size(dragon->way);
+        stack_destroy(dragon->way, NULL);
     }
+    /*se construye el nuevo camino*/
+    dragon->way = stack_create();
+    if(dragon->way != NULL){
+        ancestor = SINK;
+        do{
+            cutNode = abb_search(cut, x);
+            result = stack_bpush(dragon->way, cutNode);
+            ancestor = cutNode_getAncestor(cutNode);
+        while((cutNode_getX(cutNode) != SOURCE) && (result != 1))}
+        wSizeNew = stack_size(dragon->way);
+    }
+    /*Pos: los caminos son de longitud igual o mayor al anterior calculado*/
+    assert(wSize <= wSizeNew);
+    return result;
 }
 
 u32 AumentarFlujo(DragonP dragon){
 /*
  * Actualiza el flujo en el network N.
  * Precondicion: la busqueda con ECAML debe haber llegado a 't' pero todavia no
- *              haber actualizado el flujo.
+ *              haber actualizado el flujo.DondeEstamosParados(dragon) = X10
  * input:   Network
  * output:  valor por el cual se aumenta el flujo
  *          0 si ocurrio error (en particular, incumplimiento por precondicion)
 */
-    u64 flow
-    if(DondeEstamosParados(dragon) mod 100 >= 10 ){/*esto no seria precondicion?*/
-        path = vertTree_search(t);
-        flow = path->cap;
-        while(path != s){
-            path = vertTree_search(path)->ancestor;
-            
+    u64 flow;
+    int son;
+    Edge edgePivot;
+    
+    if(DondeEstamosParados(dragon)%100 == 10 ){
+        /*TODO ESTA FUNCION DEPENDE DE LA IMPLEMENTACION DEL CORTE Y EL CAMINO*/
+
         }
     }
 }
@@ -162,7 +255,8 @@ int DondeEstamosParados(DragonP dragon){
  * input:   Network
  * output:  100*a + 10*b + c donde 'a' indica si es flujo maximal o no,
  *                                 'b' indica si ECAML llego a 't' o no,
- *                                 'c' indica si ECAML actualizo el flujo o no.
+ *                                 'c' indica si los resultados de ECAML fueron 
+ *                                       usados para actualizar el flujo o no.
  *          Las variables son 1 en caso positivo y 0 en caso negativo.
 */
     int *arr;
@@ -173,14 +267,28 @@ int DondeEstamosParados(DragonP dragon){
 
 /* Impresores */
 
-u32 AumentarFlujoYtambienImprimirCamino(){
+u32 AumentarFlujoYtambienImprimirCamino(DragonP dragon){
     
+    flow = AumentarFlujo();
+    
+    
+    return flow;
 }
 
-void ImprimirFlujo(DragonP N){
-    
+void ImprimirFlujo(DragonP dragon){
+    assert(dragon != NULL);
+    /*bardo con imprimir u64*/
+    if (DondeEstamosParados(dragon)/100 == 1){
+        printf("Flujo Maximal: %u%u \n", dragon->flow[0], dragon->flow[1]);
+    }else{
+        printf("Flujo no maximal: %u%u \n", dragon->flow[0], dragon->flow[1]);
+    }
 }
 
-void ImprimirCorte(DragonP N){
+void ImprimirCorte(DragonP dragon){
+    assert(dragon != NULL);
     
+    /*TODO hay que aplastar el arbol e imprimir los elementos del corte.
+     * Lo mejor seria respetar que unicamente se hagan prints en el API.
+     */
 }
