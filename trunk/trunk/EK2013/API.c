@@ -121,7 +121,7 @@ int ECAML(DragonP dragon){
 */
     EdgeNode s = NULL;
     Queue Q = NULL;
-    error = 1;
+    error = 0;
     result = -1;
     CutNode cutNode;
     assert(dragon != NULL);
@@ -138,57 +138,50 @@ int ECAML(DragonP dragon){
             /*clavo un assert porque la busqueda siempre devuelve un edge
              * valido, sino algo hicimos mal*/
             assert(s != NULL);
-            error = queue_enqueue(Q, s);
-            if (error != 1){
-                /*caso especial del tipo cutNode*/
-                cutNode = cutNode_create(SOURCE, s, 0);
-                if(cutNode != NULL){
-                    error = abb_add(dragon->cut, CutNode);
-                }else{
-                    error = -1;
-                }
-                if (error != 1){
-                    while ((!queue_isEmpty(Q) || queue_head(Q)!= SINK) 
-                            && error != 1){
-                        error = forward_search(Q, dragon->cut);
-                        if (error != 1){
-                            error = backward_search(Q, dragon->cut);
-                            queue_dequeue(Q);
-                        }
-                    }
-                    if (error != 1){
-                        if (abb_exists(dragon->cut, SINK)){
-                            cutToWat(dragon);
-                            
-                            
-                            cutPivot = abb_search(dragon->cut, SINK)
-                            flow = edge_getFlow(cutPivot->edge, SINK, cutPivot->direction);
-                            bconchar(dragon->way, bfromcstr('t'))
-                            /*mientras no lleguemos a SOURCE*/
-                            while (cutPivot->edge != NULL){
-                                /*Buscamos quien agrego a este elem*/
-                                son = edge_getX(pivot->edge)
-                                cutPivot = abb_search(dragon->cut, son);
-                                if(cutPivot->direction == FORWARD){    
-                                    flow = fmin(flow, edge_getFlow(cutPivot->edge, son, FORWARD));
-                                }else{/*BACKWARD*/
-                                    flow = fmin(flow, edge_getFlow(cutPivot->edge, son, BACKWARD));
-                                }
-                            result = 1;
-                        }else{
-                            result = 0;
-                        }
-                    }
-                }
-            }
+			error = queue_enqueue(Q, s);
+			/*caso especial del tipo cutNode*/
+			cutNode = cutNode_create(SOURCE, s, 0);
+			if (cutNode != NULL){
+				abb_add(dragon->cut, cutNode);
+				while((!queue_isEmpty(Q) || queue_head(Q)!= SINK) && error == 0){
+					error = forward_search(Q, dragon->cut);
+					if (error == 0){
+						error = backward_search(Q, dragon->cut);
+						queue_dequeue(Q);
+					}
+				}
+				if (error == 0){
+					if (abb_exists(dragon->cut, SINK)){
+						cutToWat(dragon);
+						
+						
+						cutPivot = abb_search(dragon->cut, SINK)
+						flow = edge_getFlow(cutPivot->edge, SINK, cutPivot->direction);
+						bconchar(dragon->way, bfromcstr('t'))
+						/*mientras no lleguemos a SOURCE*/
+						while (cutPivot->edge != NULL){
+							/*Buscamos quien agrego a este elem*/
+							son = edge_getX(pivot->edge)
+							cutPivot = abb_search(dragon->cut, son);
+							if(cutPivot->direction == FORWARD){
+								flow = fmin(flow, edge_getFlow(cutPivot->edge, son, FORWARD));
+							}else{/*BACKWARD*/
+								flow = fmin(flow, edge_getFlow(cutPivot->edge, son, BACKWARD));
+							}
+						}
+						result = 1;
+					}else{
+						result = 0;
+					}
+				}
+			}
         }
         dequeue_destroy(Q);
     }
     return result;
 }
-}
 /*Pre: t pertenece al corte*/
-int cutToWay(Dragon dragon){
+int fromCutToWay(Dragon dragon){
     Abb cut;
     CutNode cutNode;
     u32 ancestor;
@@ -240,9 +233,11 @@ u32 AumentarFlujo(DragonP dragon){
         }
     }
 }
-
+/*funcionara esto??? TODO */
 u64 Sumar64(u64 a, u32 b){
-    
+	u64 aux;
+	auxB = (u64) b;
+	return (a+auxB);
 }
 
 
@@ -291,4 +286,19 @@ void ImprimirCorte(DragonP dragon){
     /*TODO hay que aplastar el arbol e imprimir los elementos del corte.
      * Lo mejor seria respetar que unicamente se hagan prints en el API.
      */
+}
+
+int forward_search(Queue q, Abb cut){
+	u32 x;
+	Edge edge;
+	
+	assert(q != NULL && cut != NULL)
+	
+	x = edge_getX(queue_head(q));
+	edge = abb_search(cut, x);
+	
+}
+
+int backward_search(){
+
 }

@@ -20,6 +20,41 @@ struct edgeSt{
     Abb *bAbb;  /* Los nodos vecinos por backward*/
 };
 
+
+/* Funciones del modulo*/
+
+static FNode fNode_create(u32 y, u32 cap);
+static void fNode_destroy(FNode fNode);
+static u32 fNode_getFlow(FNode fNode);
+static void fNode_addFlow(FNode fNode, u32 flow);
+static u32 fNode_getCap(FNode fNode);
+static u32 fNode_getY(FNode fNode); 
+
+static BNode bNode_create(u32 y, Edge * edge);
+static void bNode_destroy(BNode bNode);
+static u32 bNode_getFlow(BNode bNode);
+static void bNode_addFlow(BNode bNode, u32 flow);
+static u32 bNode_getCap(BNode bNode);
+static u32 bNode_getY(BNode bNode); 
+
+
+BNode bNode_create(u32 y, Edge * edge){
+	BNode bNode;
+	
+	bNode = (BNode) malloc(sizeof(BNodeSt))
+	if(bNode != NULL){
+		bNode->y = edge;
+	}
+}
+
+void bNode_create(BNode bNode){
+	free(bNode);
+}
+
+
+
+
+/* funciones sobre Edges*/
 Edge edge_create(u32 x){
     Edge edge;
     
@@ -89,11 +124,10 @@ void edge_setFlow(Edge edge, u32 y, u32 flow, int direction){
     assert(edge != NULL);
     
     if(direction == FORWARD){
-        yNode = abb_search(edge->fAbb, y);
+        fNode_setFlow(abb_search(edge->fAbb, y), flow);
     }else{
-        yNode = *(abb_search(edge->bAbb, y));/*lo apuntado por*/
+        bNode_setFlow(abb_search(edge->bAbb, y), flow);
     }
-    yNode->flow += flow * direction;
 }
 
 /*La capacidad solo se pide de lados forwards*/
@@ -102,7 +136,7 @@ u32 edge_getCap(Edge edge, u32 y){
     assert(edge != NULL)
 
     yNode = abb_search(edge->fAbb, y);
-    return yNode->cap;
+    return fNode_getCap(yNode);
 }
 
 u32 edge_getFlow(Edge edge , u32 y, int direction){
@@ -117,5 +151,74 @@ u32 edge_getFlow(Edge edge , u32 y, int direction){
     }
     return yNode->flow;
 }
+
+
+/*funciones sobre Nodes*/
+
+FNode fNode_create(u32 y, u32 cap){
+	FNode fNode;
+	
+	fNode = (FNode) malloc(sizeof(FNodeSt));
+	if(fNode != NULL){
+		fNode->y = y;
+		fNode->cap = cap;
+		fNode->flow = 0;
+	}
+	return fNode;
+}
+void fNode_create(FNode fNode){
+	free(fNode);
+}
+u64 fNode_getFlow(FNode fNode){
+	return(fNode->flow);
+}
+void fNode_addFlow(FNode fNode, u32 flow){
+	assert(fNode != NULL);
+	
+	fNode->flow += flow;
+	
+	assert(fNode->flow <= fNode_getCap(fNode));
+}
+u32 fNode_getCap(FNode fNode){
+	return (fNode->cap);
+}
+u32 fNode_getY(FNode fNode){
+	return(fNode->y);
+}
+
+BNode bNode_create(u32 y, Edge * edge){
+	BNode bNode;
+	
+	bNode = (BNode) malloc(sizeof(BNodeSt))
+	if(bNode != NULL){
+		bNode->y = edge;
+	}
+}
+void bNode_create(BNode bNode){
+	free(bNode);
+}
+u32 bNode_getFlow(BNode bNode){
+	return(*(fNode)->flow);
+}
+void bNode_addFlow(BNode bNode, u32 flow){
+	assert(fNode != NULL && *(bNode) != NULL);
+	
+	*(fNode)->flow += flow;
+	
+	assert(*(fNode)->flow <= bNode_getCap(bNode));
+}
+u32 bNode_getCap(BNode bNode){
+	return (*(bNode)->cap);
+}
+u32 bNode_getY(BNode bNode){
+	return(*(bNode)->y);
+}
+
+
+
+
+
+
+
 
 
