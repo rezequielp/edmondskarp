@@ -13,7 +13,7 @@ typedef struct NetworkSt{
     Abb network;     /*El network en forma de arbol binario de busqueda*/
     u64 flow;           /*Valor del flujo del network*/
     Abb cut;            /*Un abb de punteros a nodos para el corte*/
-    queue way;        /*Camino en forma de un flujo de caracteres*/
+    queue path;        /*Camino en forma de un flujo de caracteres*/
     u64 tempFlow;       /*Cant de flujo a aumentar (cap min del camino actual)*/
     int whereWeAre[3];  /*[¿flujo maximal?, ¿llego a t?, ¿aumento flujo?]*/
 } DragonSt;
@@ -30,7 +30,7 @@ DragonP NuevoDragon(){
             dragon->network = abb_create();
             dragon->flow = 0;
             dragon->cut = NULL;
-            dragon->way = NULL;
+            dragon->path = NULL;
             dragon->whereWeAre = {0, 0, 0};
             /*Si no se le asigno memoria a algo, liberamos todo lo anterior*/
             if (dragon->network == NULL || dragon->cut == NULL){
@@ -42,23 +42,41 @@ DragonP NuevoDragon(){
 }
 
 int DestruirDragon(DragonP dragon){
+	int i = 0;
+	int result = -1;
     assert(dragon != NULL);
-    
     if (dragon->network != NULL){
-        abbNet_destroy(dragon->network);
-        dragon->network = NULL;
-    }
-    if(!stack_is_empty(dragon->way)){
-        stack_destroy(dragon->way);
-        dragon->way = NULL;
-    }
-    if(dragon->cut != NULL){
-        spnode_destroy(dragon->cut);
-        dragon->cut = NULL;
-    }
-    free(dragon);
-    /*En esta funcion nunca ocurre un error, siempre termina bien!*/
-    return 1;
+		netSize = abb_size(dragon->network);
+		edgeEarbage = (edge *) malloc (sizeof(netSize));
+        abbNet_destroy(dragon->network,edgeGarbage);
+		/*ahora destruyo los elementos almacenados en el network*/
+		if (garbSize == netSize){
+			for(i=0, i<netSize, i++){
+				edge_destroy(edgeGarbage[i]);
+			}
+			free(netGarbage);
+			dragon->network = NULL;
+			if(!stack_is_empty(dragon->path)){
+			/* TODO */
+			/*ver si hay que liberar la estructura en este stack
+			 * en el caso que se guarden los datos en una tupla
+			 * (edge, direction)
+			 */
+				stack_destroy(dragon->path, NULL);
+				dragon->path = NULL;
+			}
+			if(dragon->cut != NULL){
+			/*los elementos de estaestructura son punteros al arbol
+			 *no hace falta liberarlos
+			 */
+				abb_destroy(dragon->cut, NULL);
+				dragon->cut = NULL;
+			}
+			free(dragon);
+			result = 1;
+		}
+	}
+	return result;
 }
 
 
@@ -73,7 +91,7 @@ int CargarUnLado(DragonP dragon, u32 x, u32 y, u32 c){
     edge = edgeNode_create();
     if (edge != NULL){   
         edgeNode_set(x, y, c);
-        result = network_add(dragon, edge);
+        result = abb_add(dragon, edge);
     }
     
     return result;
@@ -157,7 +175,7 @@ int ECAML(DragonP dragon){
 						
 						cutPivot = abb_search(dragon->cut, SINK)
 						flow = edge_getFlow(cutPivot->edge, SINK, cutPivot->direction);
-						bconchar(dragon->way, bfromcstr('t'))
+						bconchar(dragon->path, bfromcstr('t'))
 						/*mientras no lleguemos a SOURCE*/
 						while (cutPivot->edge != NULL){
 							/*Buscamos quien agrego a este elem*/
@@ -181,7 +199,7 @@ int ECAML(DragonP dragon){
     return result;
 }
 /*Pre: t pertenece al corte*/
-int fromCutToWay(Dragon dragon){
+int fromCutTopath(Dragon dragon){
     Abb cut;
     CutNode cutNode;
     u32 ancestor;
@@ -194,20 +212,20 @@ int fromCutToWay(Dragon dragon){
    
     cut = dragon->cut;
     
-    if(dragon->way != NULL){ 
-        wSize = stack_size(dragon->way);
-        stack_destroy(dragon->way, NULL);
+    if(dragon->path != NULL){ 
+        wSize = stack_size(dragon->path);
+        stack_destroy(dragon->path, NULL);
     }
     /*se construye el nuevo camino*/
-    dragon->way = stack_create();
-    if(dragon->way != NULL){
+    dragon->path = stack_create();
+    if(dragon->path != NULL){
         ancestor = SINK;
         do{
             cutNode = abb_search(cut, x);
-            result = stack_bpush(dragon->way, cutNode);
+            result = stack_bpush(dragon->path, cutNode);
             ancestor = cutNode_getAncestor(cutNode);
         while((cutNode_getX(cutNode) != SOURCE) && (result != 1))}
-        wSizeNew = stack_size(dragon->way);
+        wSizeNew = stack_size(dragon->path);
     }
     /*Pos: los caminos son de longitud igual o mayor al anterior calculado*/
     assert(wSize <= wSizeNew);
