@@ -42,20 +42,20 @@ DragonP NuevoDragon(){
 }
 
 int DestruirDragon(DragonP dragon){
-	int i = 0;
-	int result = -1;
+	int i;
+	int result = 0;
     assert(dragon != NULL);
     if (dragon->network != NULL){
 		netSize = abb_size(dragon->network);
-		edgeEarbage = (edge *) malloc (sizeof(netSize));
-        abbNet_destroy(dragon->network,edgeGarbage);
+		edgeGarbage = (Edge *) malloc ( netSize * sizeof(struct EdgeSt *));
+        netGarbSize = abb_destroy(dragon->network, edgeGarbage);
 		/*ahora destruyo los elementos almacenados en el network*/
-		if (garbSize == netSize){
-			for(i=0, i<netSize, i++){
+		if (netGarbSize == netSize){
+			dragon->network = NULL;
+			for(i=0, i<netGarbSize, i++){
 				edge_destroy(edgeGarbage[i]);
 			}
 			free(netGarbage);
-			dragon->network = NULL;
 			if(!stack_is_empty(dragon->path)){
 			/* TODO */
 			/*ver si hay que liberar la estructura en este stack
@@ -65,16 +65,27 @@ int DestruirDragon(DragonP dragon){
 				stack_destroy(dragon->path, NULL);
 				dragon->path = NULL;
 			}
-			if(dragon->cut != NULL){
-			/*los elementos de estaestructura son punteros al arbol
-			 *no hace falta liberarlos
-			 */
-				abb_destroy(dragon->cut, NULL);
-				dragon->cut = NULL;
-			}
-			free(dragon);
-			result = 1;
 		}
+	}
+	if(dragon->cut != NULL){
+		/*los elementos de estaestructura son punteros al arbol
+		*no hace falta liberarlos
+		*/
+		cutSize = abb_size(dragon->cut);
+		cutGarbage = (cutNode *) malloc (cutSize * sizeof(struct cutNodeSt *));
+		cutGarbSize = 	abb_destroy(dragon->cut, NULL);
+		/*ahora destruyo los elementos almacenados en el network*/
+		if (cutGarbSize == cutSize){
+			dragon->cut = NULL;
+			for(i=0, i<cutGarbSize, i++){
+				cut_destroy(cutGarbage[i]);
+			}
+			free(cutGarbage);
+		}
+	}
+	if(dragon->network != NULL && dragon->cut != NULL){
+		free(dragon);
+		result = 1;
 	}
 	return result;
 }
