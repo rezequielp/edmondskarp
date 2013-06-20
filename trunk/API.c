@@ -259,12 +259,26 @@ u32 AumentarFlujo(DragonP dragon){
     if(DondeEstamosParados(dragon)%100 == 10 ){
         /*TODO ESTA FUNCION DEPENDE DE LA IMPLEMENTACION DEL CORTE Y EL CAMINO*/
 
-        }
     }
 }
+
 /*funcionara esto??? TODO */
 u64 Sumar64(u64 a, u32 b){
-	u64 aux;
+/*opcion:
+typedef struct u64St{
+	u32 low,
+	u32 high;
+}u64;
+viendo a u64 como dos u32 entonces:
+	u32 auxA = 0;
+	auxA= a->low;
+	a->low += b;
+	if(a->low < min(auxA, b)){
+		a->high += 1;
+	}
+
+*/
+	u64 auxB;
 	auxB = (u64) b;
 	return (a+auxB);
 }
